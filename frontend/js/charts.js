@@ -2,6 +2,8 @@ import { state } from './state.js';
 import { THRESHOLDS } from './config.js';
 
 const DAYS_BY_RANGE = { daily: 7, weekly: 28, monthly: 90, yearly: 365 };
+const ERUPTION_LABEL = 'Eruption';
+const ERUPTION_COLOR = '#ff0000';
 
 function daysToShow() {
   return DAYS_BY_RANGE[state.currentTimeRange] ?? 7;
@@ -98,6 +100,60 @@ export function updateTrendChart() {
   if (param === 'all' || param === 'so2') pushSeries('SO2Flux', 'SO₂ (tons/day)', '#4488ff', 'so2');
   if (param === 'all' || param === 'plume') pushSeries('PlumeHeight', 'Plume (m)', '#ff00ff', 'plume');
 
+  let staltaMax = 0;
+  if (param === 'veq') {
+    const STALTA_THRESHOLD = 2.0;
+    const stalta = data.map(d => {
+      const v = parseFloat(d.STALTA);
+      return isNaN(v) ? null : v;
+    });
+    staltaMax = Math.max(STALTA_THRESHOLD, ...stalta.filter(v => v !== null));
+    datasets.push({
+      type: 'bar',
+      label: 'STA/LTA (ratio)',
+      data: stalta,
+      borderColor: '#ffa060',
+      backgroundColor: '#ffa06066',
+      borderWidth: 1,
+      order: 1,
+      yAxisID: 'y1',
+    });
+    datasets.push({
+      label: `STA/LTA threshold (${STALTA_THRESHOLD.toFixed(1)})`,
+      data: dates.map(() => STALTA_THRESHOLD),
+      borderColor: '#ffa060',
+      borderWidth: 1.5,
+      borderDash: [6, 4],
+      pointRadius: 0,
+      pointHoverRadius: 0,
+      fill: false,
+      yAxisID: 'y1',
+    });
+  }
+
+  // Red dot on the first plotted series for each eruption day ("All" view only).
+  const allData = state.dashboardData[state.currentVolcano] || [];
+  const hasEruptionData = allData.some(d => d.eruption !== undefined && d.eruption !== '');
+  if (param === 'all' && hasEruptionData && datasets.length > 0) {
+    const base = datasets[0];
+    datasets.push({
+      label: ERUPTION_LABEL,
+      data: data.map((d, i) => Number(d.eruption) === 1 ? base.data[i] ?? 0 : null),
+      showLine: false,
+      pointStyle: 'circle',
+      pointRadius: 6,
+      pointHoverRadius: 8,
+      pointBackgroundColor: ERUPTION_COLOR,
+      pointBorderColor: '#ffffff',
+      pointBorderWidth: 1.5,
+      backgroundColor: ERUPTION_COLOR,
+      borderColor: ERUPTION_COLOR,
+      fill: false,
+      order: -1,
+      yAxisID: base.yAxisID,
+    });
+  }
+
   eventsMax = eventsMax > 0 ? eventsMax * 1.1 : undefined;
   so2Max = so2Max > 0 ? so2Max * 1.1 : undefined;
   plumeMax = plumeMax > 0 ? plumeMax * 1.1 : undefined;
@@ -106,6 +162,8 @@ export function updateTrendChart() {
   if (param === 'so2') { leftLabel = 'tons/day'; leftMax = so2Max; }
   else if (param === 'plume') { leftLabel = 'meters'; leftMax = plumeMax; }
   else if (param === 'all') { rightLabel = 'tons/day, meters'; rightMax = Math.max(so2Max || 0, plumeMax || 0); }
+  else if (param === 'veq') { rightLabel = 'STA/LTA ratio'; rightMax = staltaMax * 1.1; }
+  const showRight = param === 'all' || param === 'veq';
 
   state.trendChart = new Chart(ctx, {
     type: 'line',
@@ -114,7 +172,26 @@ export function updateTrendChart() {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: { display: true, labels: { color: '#8892a8', font: { family: 'JetBrains Mono', size: 10 } } },
+        legend: {
+          display: true,
+          labels: {
+            color: '#8892a8',
+            font: { family: 'JetBrains Mono', size: 10 },
+            // usePointStyle is all-or-nothing, so give the other series square markers.
+            usePointStyle: true,
+            generateLabels: chart => Chart.defaults.plugins.legend.labels.generateLabels(chart)
+              .map(item => item.text === ERUPTION_LABEL ? item : { ...item, pointStyle: 'rect' }),
+            sort: (a, b) => (a.text === ERUPTION_LABEL) - (b.text === ERUPTION_LABEL),
+          },
+        },
+        tooltip: {
+          callbacks: {
+            // The dot's y-value is only its position on the base line, not data.
+            label: ctx => ctx.dataset.label === ERUPTION_LABEL
+              ? ERUPTION_LABEL
+              : `${ctx.dataset.label}: ${ctx.formattedValue}`,
+          },
+        },
       },
       scales: {
         y: {
@@ -124,12 +201,15 @@ export function updateTrendChart() {
           title: { display: true, text: leftLabel, color: '#8892a8', font: { size: 10 } },
         },
         y1: {
-          type: 'linear', display: param === 'all', position: 'right',
-          ticks: { color: '#8892a8', stepSize: 1, callback: v => Math.round(v) },
+          type: 'linear', display: showRight, position: 'right',
+          ticks: param === 'veq'
+            ? { color: '#8892a8', callback: v => v.toFixed(1) }
+            : { color: '#8892a8', stepSize: 1, callback: v => Math.round(v) },
           grid: { drawOnChartArea: false }, beginAtZero: true, max: rightMax,
-          title: { display: param === 'all', text: rightLabel, color: '#8892a8', font: { size: 10 } },
+          title: { display: showRight, text: rightLabel, color: '#8892a8', font: { size: 10 } },
         },
         x: {
+          offset: param === 'veq',
           ticks: { color: '#8892a8', maxRotation: 45, minRotation: 0, autoSkip: true, maxTicksLimit: 10 },
           grid: { color: '#2a3040' },
           title: { display: false },
