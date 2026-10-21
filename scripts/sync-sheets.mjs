@@ -8,12 +8,12 @@ const OUT_DIR = join(__dirname, '..', 'frontend', 'data');
 
 const COLUMN_INDICES_DEFAULT = {
   DATE: 0, AlertLevel: 1, VEQ: 2, VolcanicTremors: 3,
-  Rockfall: 4, PDCEvents: 5, SO2Flux: 6, PlumeHeight: 7,
+  Rockfall: 4, PDCEvents: 5, SO2Flux: 6, PlumeHeight: 7, STALTA: null,
 };
 
 const COLUMN_INDICES_KANLAON = {
   DATE: 2, AlertLevel: 1, VEQ: 3, VolcanicTremors: null,
-  Rockfall: null, PDCEvents: null, SO2Flux: 7, PlumeHeight: 8,
+  Rockfall: null, PDCEvents: null, SO2Flux: 7, PlumeHeight: 8, STALTA: 13, Eruption: 10
 };
 
 const VOLCANO_SOURCES = {
@@ -49,6 +49,11 @@ async function fetchSheet(sheetId, tab) {
   return payload.table;
 }
 
+// Eruption days are rows whose Eruption cell mentions the word "eruption".
+function isEruption(cell) {
+  return /eruption/i.test(String(cell ?? ''));
+}
+
 function parseRows(table) {
   if (!table?.rows) return [];
   return table.rows.map(r => (r.c || []).map(c => c ? (c.v ?? c.f ?? '') : ''));
@@ -82,6 +87,7 @@ function rowsToObjects(rows, cols) {
     PDCEvents: pick(row, cols.PDCEvents),
     SO2Flux: pick(row, cols.SO2Flux),
     PlumeHeight: pick(row, cols.PlumeHeight),
+    STALTA: pick(row, cols.STALTA),
   }));
 }
 
@@ -90,6 +96,13 @@ async function syncOne(name, source) {
   const rows = parseRows(table);
   const records = rowsToObjects(rows, source.columns)
     .filter(r => r.DATE !== '' && r.DATE !== null);
+  if (source.columns.Eruption != null) {
+    const eruptions = new Set(rows
+      .filter(row => isEruption(pick(row, source.columns.Eruption)))
+      .map(row => normalizeDate(pick(row, source.columns.DATE))));
+    for (const r of records) r.eruption = eruptions.has(r.DATE) ? 1 : 0;
+    console.log(`[${name}] ${eruptions.size} eruption days`);
+  }
   const outPath = join(OUT_DIR, `${name}.json`);
   await writeFile(outPath, JSON.stringify({
     volcano: name,

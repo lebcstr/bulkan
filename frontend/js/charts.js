@@ -2,6 +2,9 @@ import { state } from './state.js';
 import { THRESHOLDS } from './config.js';
 
 const DAYS_BY_RANGE = { daily: 7, weekly: 28, monthly: 90, yearly: 365 };
+const ERUPTION_LABEL = 'Eruption';
+const ERUPTION_COLOR = '#ff0000';
+export const STALTA_THRESHOLD = 2.0;
 
 function daysToShow() {
   return DAYS_BY_RANGE[state.currentTimeRange] ?? 7;
@@ -63,6 +66,112 @@ function updateStats(data) {
   document.getElementById('avg-plume').textContent = avg(data.map(d => d.PlumeHeight));
 }
 
+const ERUPTION_HOVER_PX = 6;
+
+function eruptionLinesPlugin(indices) {
+  let hovered = null;
+  const linesVisible = chart => {
+    const dsIndex = chart.data.datasets.findIndex(ds => ds.label === ERUPTION_LABEL);
+    return dsIndex >= 0 && chart.isDatasetVisible(dsIndex) && indices.length > 0;
+  };
+
+  return {
+    id: 'eruptionLines',
+    afterEvent(chart, args) {
+      const e = args.event;
+      let next = null;
+      if (e.type === 'mousemove' && linesVisible(chart)) {
+        const { left, right, top, bottom } = chart.chartArea;
+        if (e.x >= left && e.x <= right && e.y >= top && e.y <= bottom) {
+          next = indices.find(i => Math.abs(chart.scales.x.getPixelForValue(i) - e.x) <= ERUPTION_HOVER_PX) ?? null;
+        }
+      }
+      if (next !== hovered) {
+        hovered = next;
+        chart.canvas.style.cursor = hovered !== null ? 'pointer' : '';
+        args.changed = true;
+      }
+    },
+    afterDatasetsDraw(chart) {
+      if (!linesVisible(chart)) return;
+      const { ctx, chartArea: { top, bottom }, scales: { x } } = chart;
+      ctx.save();
+      ctx.strokeStyle = ERUPTION_COLOR;
+      ctx.shadowColor = ERUPTION_COLOR;
+      ctx.setLineDash([3, 3]);
+      for (const i of indices) {
+        const px = x.getPixelForValue(i);
+        const isHovered = i === hovered;
+        ctx.lineWidth = isHovered ? 3 : 2;
+        ctx.shadowBlur = isHovered ? 18 : 10;
+        ctx.beginPath();
+        ctx.moveTo(px, top);
+        ctx.lineTo(px, bottom);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      if (hovered === null) return;
+      drawHoverLabel(chart, `Eruption on ${chart.data.labels[hovered]}`, x.getPixelForValue(hovered), top + 6, ERUPTION_COLOR, 8);
+    },
+  };
+}
+
+// Dark label box centred on px, clamped to the chart area.
+function drawHoverLabel(chart, text, px, boxY, color, glow = 0) {
+  const { ctx, chartArea: { left, right } } = chart;
+  ctx.save();
+  ctx.font = '600 11px "JetBrains Mono", monospace';
+  const padX = 8, boxH = 22;
+  const boxW = ctx.measureText(text).width + padX * 2;
+  const boxX = Math.min(Math.max(px - boxW / 2, left), right - boxW);
+  ctx.fillStyle = 'rgba(0,0,0,0.85)';
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1;
+  ctx.shadowColor = color;
+  ctx.shadowBlur = glow;
+  ctx.beginPath();
+  ctx.rect(boxX, boxY, boxW, boxH);
+  ctx.fill();
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#ffffff';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, boxX + padX, boxY + boxH / 2);
+  ctx.restore();
+}
+
+// Shows a label while the mouse is on the horizontal STA/LTA threshold line.
+function thresholdHoverPlugin(label, value, color) {
+  let hoverX = null;
+  const lineVisible = chart => {
+    const dsIndex = chart.data.datasets.findIndex(ds => ds.label === label);
+    return dsIndex >= 0 && chart.isDatasetVisible(dsIndex);
+  };
+
+  return {
+    id: 'thresholdHover',
+    afterEvent(chart, args) {
+      const e = args.event;
+      let next = null;
+      if (e.type === 'mousemove' && lineVisible(chart)) {
+        const { left, right } = chart.chartArea;
+        const py = chart.scales.y1.getPixelForValue(value);
+        if (e.x >= left && e.x <= right && Math.abs(e.y - py) <= ERUPTION_HOVER_PX) next = e.x;
+      }
+      if (next !== hoverX) {
+        hoverX = next;
+        args.changed = true;
+      }
+    },
+    afterDraw(chart) {
+      if (hoverX === null || !lineVisible(chart)) return;
+      const py = chart.scales.y1.getPixelForValue(value);
+      drawHoverLabel(chart, `STA/LTA ${value.toFixed(1)} Threshold`, hoverX, Math.max(py - 30, chart.chartArea.top), color);
+    },
+  };
+}
+
 export function updateTrendChart() {
   const data = getDataForTimeRange();
   const ctx = document.getElementById('trendChart');
@@ -98,6 +207,63 @@ export function updateTrendChart() {
   if (param === 'all' || param === 'so2') pushSeries('SO2Flux', 'SO₂ (tons/day)', '#4488ff', 'so2');
   if (param === 'all' || param === 'plume') pushSeries('PlumeHeight', 'Plume (m)', '#ff00ff', 'plume');
 
+  let staltaMax = 0;
+  let hasStalta = false;
+  const STALTA_THRESHOLD_LABEL = `STA/LTA threshold (${STALTA_THRESHOLD.toFixed(1)})`;
+  if (param === 'veq') {
+    const stalta = data.map(d => {
+      const v = parseFloat(d.STALTA);
+      return isNaN(v) ? null : v;
+    });
+    const staltaValues = stalta.filter(v => v !== null);
+    hasStalta = staltaValues.length > 0;
+    staltaMax = Math.max(STALTA_THRESHOLD, ...staltaValues);
+    datasets.push({
+      type: 'bar',
+      label: 'STA/LTA (ratio)',
+      data: stalta,
+      borderColor: '#ffa060',
+      backgroundColor: '#ffa06066',
+      borderWidth: 1,
+      order: 1,
+      yAxisID: 'y1',
+    });
+    // Only draw the threshold line when the visible window has STA/LTA readings.
+    if (hasStalta) {
+      datasets.push({
+        label: STALTA_THRESHOLD_LABEL,
+        data: dates.map(() => STALTA_THRESHOLD),
+        borderColor: '#ffa060',
+        borderWidth: 1.5,
+        borderDash: [6, 4],
+        pointRadius: 0,
+        pointHoverRadius: 0,
+        fill: false,
+        yAxisID: 'y1',
+      });
+    }
+  }
+
+  // Vertical dotted line on each eruption day. The dataset holds no points; it only
+  // provides the legend entry (and toggle) for the lines drawn by eruptionLinesPlugin.
+  const allData = state.dashboardData[state.currentVolcano] || [];
+  const hasEruptionData = allData.some(d => d.eruption !== undefined && d.eruption !== '');
+  const eruptionIdx = hasEruptionData
+    ? data.map((d, i) => Number(d.eruption) === 1 ? i : -1).filter(i => i >= 0)
+    : [];
+  if (hasEruptionData) {
+    datasets.push({
+      label: ERUPTION_LABEL,
+      data: dates.map(() => null),
+      pointStyle: 'line',
+      borderColor: ERUPTION_COLOR,
+      backgroundColor: ERUPTION_COLOR,
+      borderWidth: 2,
+      borderDash: [3, 3],
+      fill: false,
+    });
+  }
+
   eventsMax = eventsMax > 0 ? eventsMax * 1.1 : undefined;
   so2Max = so2Max > 0 ? so2Max * 1.1 : undefined;
   plumeMax = plumeMax > 0 ? plumeMax * 1.1 : undefined;
@@ -106,6 +272,8 @@ export function updateTrendChart() {
   if (param === 'so2') { leftLabel = 'tons/day'; leftMax = so2Max; }
   else if (param === 'plume') { leftLabel = 'meters'; leftMax = plumeMax; }
   else if (param === 'all') { rightLabel = 'tons/day, meters'; rightMax = Math.max(so2Max || 0, plumeMax || 0); }
+  else if (param === 'veq') { rightLabel = 'STA/LTA ratio'; rightMax = staltaMax * 1.1; }
+  const showRight = param === 'all' || param === 'veq';
 
   state.trendChart = new Chart(ctx, {
     type: 'line',
@@ -114,7 +282,23 @@ export function updateTrendChart() {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: { display: true, labels: { color: '#8892a8', font: { family: 'JetBrains Mono', size: 10 } } },
+        legend: {
+          display: true,
+          labels: {
+            color: '#8892a8',
+            font: { family: 'JetBrains Mono', size: 10 },
+            // usePointStyle is all-or-nothing, so give the other series square markers.
+            usePointStyle: true,
+            generateLabels: chart => Chart.defaults.plugins.legend.labels.generateLabels(chart)
+              .map(item => item.text === ERUPTION_LABEL ? item : { ...item, pointStyle: 'rect' }),
+            sort: (a, b) => (a.text === ERUPTION_LABEL) - (b.text === ERUPTION_LABEL),
+          },
+        },
+        tooltip: {
+          callbacks: {
+            footer: items => items.length && eruptionIdx.includes(items[0].dataIndex) ? ERUPTION_LABEL : '',
+          },
+        },
       },
       scales: {
         y: {
@@ -124,18 +308,25 @@ export function updateTrendChart() {
           title: { display: true, text: leftLabel, color: '#8892a8', font: { size: 10 } },
         },
         y1: {
-          type: 'linear', display: param === 'all', position: 'right',
-          ticks: { color: '#8892a8', stepSize: 1, callback: v => Math.round(v) },
+          type: 'linear', display: showRight, position: 'right',
+          ticks: param === 'veq'
+            ? { color: '#8892a8', callback: v => v.toFixed(1) }
+            : { color: '#8892a8', stepSize: 1, callback: v => Math.round(v) },
           grid: { drawOnChartArea: false }, beginAtZero: true, max: rightMax,
-          title: { display: param === 'all', text: rightLabel, color: '#8892a8', font: { size: 10 } },
+          title: { display: showRight, text: rightLabel, color: '#8892a8', font: { size: 10 } },
         },
         x: {
+          offset: param === 'veq',
           ticks: { color: '#8892a8', maxRotation: 45, minRotation: 0, autoSkip: true, maxTicksLimit: 10 },
           grid: { color: '#2a3040' },
           title: { display: false },
         },
       },
     },
+    plugins: [
+      eruptionLinesPlugin(eruptionIdx),
+      ...(hasStalta ? [thresholdHoverPlugin(STALTA_THRESHOLD_LABEL, STALTA_THRESHOLD, '#ffa060')] : []),
+    ],
   });
 
   updateStats(data);
