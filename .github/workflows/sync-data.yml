@@ -3,12 +3,7 @@ name: Sync Sheets Data
 on:
   schedule:
     - cron: '0 1 * * *'  # 09:00 PH time (UTC+8) — ~30 min after upstream sheet refresh at 08:30 PH
-  workflow_dispatch:
-    inputs:
-      force_alert:
-        description: 'Send the STA/LTA email even if the latest reading was already reported'
-        type: boolean
-        default: false
+  workflow_dispatch: {}
 
 permissions:
   contents: write
@@ -26,29 +21,6 @@ jobs:
       - name: Run sync
         working-directory: scripts
         run: npm run sync
-
-      # Must run before the commit step: it compares against the last committed snapshot.
-      - name: Check STA/LTA threshold
-        id: stalta
-        working-directory: scripts
-        env:
-          FORCE_ALERT: ${{ inputs.force_alert || 'false' }}
-          DASHBOARD_URL: ${{ vars.DASHBOARD_URL }}
-        run: npm run check-stalta
-
-      - name: Email STA/LTA alert
-        if: steps.stalta.outputs.alert == 'true'
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: ${{ secrets.SMTP_SERVER }}
-          server_port: ${{ secrets.SMTP_PORT }}
-          secure: ${{ secrets.SMTP_PORT == '465' }}
-          username: ${{ secrets.SMTP_USERNAME }}
-          password: ${{ secrets.SMTP_PASSWORD }}
-          from: Bulkan Alerts <${{ secrets.SMTP_USERNAME }}>
-          to: ${{ secrets.ALERT_RECIPIENTS }}
-          subject: ${{ steps.stalta.outputs.subject }}
-          html_body: file://${{ steps.stalta.outputs.body_file }}
 
       - name: Commit snapshots
         run: |
