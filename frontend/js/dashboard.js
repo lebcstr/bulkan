@@ -61,6 +61,7 @@ function renderParams() {
     { key: 'PDCEvents', label: 'PDC Events', unit: 'events/day' },
     { key: 'SO2Flux', label: 'SO₂ Flux', unit: 'tons/day' },
     { key: 'PlumeHeight', label: 'Plume Height', unit: 'm' },
+    { key: 'STALTA', label: 'STA/LTA', unit: 'ratio' },
   ];
 
   let html = '';
@@ -73,6 +74,8 @@ function renderParams() {
       if (typeof val === 'string') {
         const num = parseFloat(val);
         if (!isNaN(num) && num !== 0) display = Math.round(num * 100) / 100;
+      } else if (typeof val === 'number') {
+        display = Math.round(val * 100) / 100;
       }
       html += `
         <div class="param-item">
