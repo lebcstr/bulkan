@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "sync": "node sync-sheets.mjs"
+    "sync": "node sync-sheets.mjs",
+    "check-stalta": "node check-stalta.mjs"
   },
   "engines": {
     "node": ">=20"
