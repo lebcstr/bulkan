@@ -1,5 +1,6 @@
 import { render, selectVol } from './dashboard.js';
 import { initMap, selectZone } from './map.js';
+import { initAshDepositMap, updateAshDeposit } from './ash-deposit.js';
 import { loadDepEdSchools } from './schools.js';
 import { loadVolcanoData, initializeMockData } from './data.js';
 import { selectTimeRange, selectParameter, navigatePeriod } from './charts.js';
@@ -24,6 +25,7 @@ function setStatus(text) {
 
 async function main() {
   initMap();
+  initAshDepositMap();
 
   initializeMockData();
   render();
@@ -33,6 +35,7 @@ async function main() {
 
   try {
     await loadDepEdSchools();
+    updateAshDeposit();
   } catch (e) {
     console.error('[main] failed to load schools:', e);
   }
