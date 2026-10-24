@@ -2,27 +2,38 @@ import { state } from './state.js';
 import { VOLCANO_META, ASH_DEPOSIT_MANIFEST_URL } from './config.js';
 import { calculateDistance } from './schools.js';
 
-// Sequential ramp: thin deposits pale, thick deposits dark.
-const THICKNESS_COLORS = [
-  [10, '#7f1d1d'],
-  [3, '#b91c1c'],
-  [1, '#ea580c'],
-  [0.3, '#f59e0b'],
-  [0.1, '#facc15'],
-  [0.03, '#a3e635'],
-  [0.01, '#67e8f9'],
-];
+// Sequential ramp, thinnest to thickest. Spread over however many isopachs a
+// model has (Ash3d exports range from 7 levels to 10+), so every level is distinct.
+const THICKNESS_RAMP = ['#67e8f9', '#a3e635', '#facc15', '#f59e0b', '#ea580c', '#b91c1c', '#7f1d1d'];
+
+const SCHOOLS_PER_BAND = 100;
 
 const geojsonCache = {};
 const selectedRun = {};
+let schoolRenderer = null;
 let manifestPromise = null;
 let renderToken = 0;
 let ashMap = null;
 let ashLayer = null;
 let ashLegend = null;
+let thicknessLevels = [];
+
+function rampColor(t) {
+  const pos = t * (THICKNESS_RAMP.length - 1);
+  const i = Math.min(Math.floor(pos), THICKNESS_RAMP.length - 2);
+  const rgb = hex => [1, 3, 5].map(k => parseInt(hex.slice(k, k + 2), 16));
+  const [a, b] = [rgb(THICKNESS_RAMP[i]), rgb(THICKNESS_RAMP[i + 1])];
+  return '#' + a.map((c, k) => Math.round(c + (b[k] - c) * (pos - i)).toString(16).padStart(2, '0')).join('');
+}
+
+// 0 for the thinnest isopach of the current model, 1 for the thickest.
+function levelOf(mm) {
+  const i = thicknessLevels.filter(v => v <= mm).length - 1;
+  return thicknessLevels.length < 2 ? 1 : Math.max(i, 0) / (thicknessLevels.length - 1);
+}
 
 function colorFor(mm) {
-  return (THICKNESS_COLORS.find(([v]) => mm >= v) || THICKNESS_COLORS.at(-1))[1];
+  return rampColor(levelOf(mm));
 }
 
 // Ash3d splits long contours into several out-of-order line parts; join them
@@ -117,12 +128,15 @@ function makeLegend(values) {
 
 function addSchoolMarkers(schools, values) {
   const markers = {};
+  // Large scenarios can cover 10k+ schools: draw on canvas and shrink the dots.
+  const dense = schools.length > 2000;
   for (const s of schools) {
     const color = colorFor(s.thickness);
     const marker = L.circleMarker([s.lat, s.lng], {
-      radius: 5, fillColor: color, color: '#e8eaf0', weight: 1.5, fillOpacity: 0.95,
+      renderer: schoolRenderer,
+      radius: dense ? 3 : 5, fillColor: color, color: '#e8eaf0', weight: dense ? 0.5 : 1.5, fillOpacity: 0.95,
     });
-    marker.bindPopup(`
+    marker.bindPopup(() => `
       <div style="font-family:'JetBrains Mono',monospace;font-size:12px;min-width:240px;color:#e8eaf0;background:var(--surface);border:1px solid var(--border);border-radius:6px;">
         <div style="background:var(--surface2);padding:0.75rem;border-bottom:1px solid var(--border);border-radius:6px 6px 0 0;">
           <strong style="color:#ff6b35;font-size:13px;">📚 SCHOOL (${s.type})</strong>
@@ -152,13 +166,19 @@ function renderSchoolBox(schools, values, markers) {
     <div class="ash-band-chip" style="border-left-color:${colorFor(b.value)}">
       <span>${bandLabel(b.value, values)}</span><strong>${b.schools.length}</strong>
     </div>`).join('');
-  const list = bands.filter(b => b.schools.length).map(b => `
+  const items = (list, color) => list.map(s => `
+    <div class="ash-school-item" data-id="${s.id}" style="border-left-color:${color}">
+      <div>📚 ${s.name}</div>
+      <div class="ash-school-meta">${s.type} • ${s.distance.toFixed(1)} km</div>
+    </div>`).join('');
+  // Render the first SCHOOLS_PER_BAND per band; the rest on request.
+  const list = bands.filter(b => b.schools.length).map((b, i) => `
     <div class="ash-band-title" style="color:${colorFor(b.value)}">${bandLabel(b.value, values)} • ${b.schools.length}</div>
-    ${b.schools.map(s => `
-      <div class="ash-school-item" data-id="${s.id}" style="border-left-color:${colorFor(b.value)}">
-        <div>📚 ${s.name}</div>
-        <div class="ash-school-meta">${s.type} • ${s.distance.toFixed(1)} km</div>
-      </div>`).join('')}`).join('');
+    ${items(b.schools.slice(0, SCHOOLS_PER_BAND), colorFor(b.value))}
+    ${b.schools.length > SCHOOLS_PER_BAND
+      ? `<button class="ash-show-more" data-band="${i}">Show all ${b.schools.length} schools</button>`
+      : ''}`).join('');
+  const shownBands = bands.filter(b => b.schools.length);
 
   el.innerHTML = `
     <div class="ash-school-head">
@@ -168,33 +188,44 @@ function renderSchoolBox(schools, values, markers) {
     <div class="ash-band-chips">${chips}</div>
     <div class="ash-school-list">${list || '<div class="ash-school-meta" style="text-align:center">No schools</div>'}</div>`;
 
-  el.querySelectorAll('.ash-school-item').forEach(item => {
-    item.addEventListener('click', () => {
-      const marker = markers[item.dataset.id];
-      if (!marker) return;
-      ashMap.flyTo(marker.getLatLng(), 13, { duration: 0.8 });
-      marker.openPopup();
-    });
+  el.querySelector('.ash-school-list').addEventListener('click', e => {
+    const more = e.target.closest('.ash-show-more');
+    if (more) {
+      const band = shownBands[more.dataset.band];
+      more.outerHTML = items(band.schools.slice(SCHOOLS_PER_BAND), colorFor(band.value));
+      return;
+    }
+    const item = e.target.closest('.ash-school-item');
+    const marker = item && markers[item.dataset.id];
+    if (!marker) return;
+    ashMap.flyTo(marker.getLatLng(), 13, { duration: 0.8 });
+    marker.openPopup();
   });
 }
 
-function renderInfo(props) {
+// Older Ash3d exports carry no eruption parameters, so only show what exists.
+function renderInfo(props, model, values) {
   const el = document.getElementById('ash-deposit-info');
   if (!el) return;
+  const utc = iso => new Date(iso).toUTCString().replace(':00 GMT', ' UTC');
   const rows = [
-    ['Eruption start', new Date(props.E_STIME).toUTCString().replace(':00 GMT', ' UTC')],
-    ['Plume height', `${parseFloat(props.E_PLMH)} km`],
-    ['Duration', `${parseFloat(props.E_DUR)} h`],
-    ['Erupted volume', `${parseFloat(props.E_VOL)} km³`],
-    ['Deposit time', new Date(props.TIME).toUTCString().replace(':00 GMT', ' UTC')],
-    ['Model run', `${props.ORG} Ash3d · ${props['RUN CLASS']}`],
-  ];
+    ['Eruption start', props.E_STIME && utc(props.E_STIME)],
+    ['Plume height', props.E_PLMH && `${parseFloat(props.E_PLMH)} km`],
+    ['Duration', props.E_DUR && `${parseFloat(props.E_DUR)} h`],
+    ['Erupted volume', props.E_VOL && `${parseFloat(props.E_VOL)} km³`],
+    ['Deposit time', props.TIME && utc(props.TIME)],
+    ['Isopachs', `${values.length} (${values.at(-1)}–${values[0]} mm)`],
+    ['Model run', props.ORG
+      ? `${props.ORG} Ash3d · ${props['RUN CLASS']}`
+      : `Ash3d · ${new Date(model.runDate).toISOString().slice(0, 10)}`],
+  ].filter(([, v]) => v);
   el.innerHTML = rows.map(([k, v]) => `
     <div class="ash-info-row">
       <div class="ash-info-label">${k}</div>
       <div class="ash-info-value">${v}</div>
     </div>`).join('') +
-    `<a class="ash-info-link" href="${props.URL}" target="_blank" rel="noopener">USGS Ash3d ↗</a>`;
+    (props.E_STIME ? '' : '<div class="ash-info-note">Eruption parameters are not included in this shapefile (older Ash3d export).</div>') +
+    `<a class="ash-info-link" href="${props.URL || 'https://vsc-ash.wr.usgs.gov/ash3d-gui'}" target="_blank" rel="noopener">USGS Ash3d ↗</a>`;
 }
 
 function setHeader(text) {
@@ -259,6 +290,7 @@ export function initAshDepositMap() {
     attribution: '© OpenStreetMap · Ash3d © USGS',
   }).addTo(ashMap);
   ashLayer = L.layerGroup().addTo(ashMap);
+  schoolRenderer = L.canvas({ padding: 0.5 });
   updateAshDeposit();
 }
 
@@ -297,14 +329,15 @@ export async function updateAshDeposit() {
   setHeader(model.title);
   ashMap.invalidateSize();
 
-  const values = geojson.features.map(f => f.properties.VALUE).sort((a, b) => b - a);
+  const values = [...new Set(geojson.features.map(f => f.properties.VALUE))].sort((a, b) => b - a);
+  thicknessLevels = [...values].reverse();
   const isopachs = buildIsopachs(geojson);
   addBandFills(isopachs, values);
 
   const contours = L.geoJSON(geojson, {
     style: f => ({
       color: colorFor(f.properties.VALUE),
-      weight: 1.5 + f.properties.INDEX * 0.4,
+      weight: 1.5 + levelOf(f.properties.VALUE) * 2.4,
       opacity: 0.95,
     }),
     onEachFeature: (f, l) => {
@@ -324,5 +357,5 @@ export async function updateAshDeposit() {
 
   ashLegend = makeLegend(values).addTo(ashMap);
   renderSchoolBox(schools, values, markers);
-  renderInfo(geojson.features[0].properties);
+  renderInfo(geojson.features[0].properties, model, values);
 }
