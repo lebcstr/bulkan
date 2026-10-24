@@ -79,3 +79,7 @@ export const VOLCANO_SNAPSHOT_FILES = {
 };
 
 export const SCHOOLS_URL = './data/deped_schools.json';
+
+// USGS Ash3d deposit models per volcano, newest first. Produced daily from the
+// Google Drive folders by scripts/build-ash-deposits.mjs.
+export const ASH_DEPOSIT_MANIFEST_URL = './data/ash_deposits.json';

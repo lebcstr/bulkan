@@ -1,0 +1,15 @@
+{
+  "models": {
+    "Kanlaon": [
+      {
+        "id": "kanlaon_20240603T1051Z_run20260511T0256Z",
+        "title": "Kanlaon 3 June 2024 Eruption",
+        "eruptionStart": "2024-06-03T10:51:00Z",
+        "runDate": "2026-05-11T02:56:00Z",
+        "url": "./data/ash/kanlaon_20240603T1051Z_run20260511T0256Z.geojson"
+      }
+    ],
+    "Mayon": [],
+    "Taal": []
+  }
+}

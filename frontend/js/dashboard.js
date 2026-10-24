@@ -4,6 +4,7 @@ import { STALTA_THRESHOLD } from './charts.js';
 import { updateTrendChart, updateRadarChart, updateNavigationButtons } from './charts.js';
 import { updateMapMarkers, selectZone } from './map.js';
 import { updateLiveFeeds } from './kanlaon-snapshot.js';
+import { updateAshDeposit } from './ash-deposit.js';
 
 export function render() {
   renderTabs();
@@ -109,4 +110,5 @@ export function selectVol(vol) {
     selectZone(null, 6);
   }
   updateLiveFeeds();
+  updateAshDeposit();
 }
