@@ -80,10 +80,6 @@ export const VOLCANO_SNAPSHOT_FILES = {
 
 export const SCHOOLS_URL = './data/deped_schools.json';
 
-// USGS Ash3d final deposit thickness isopachs (GeoJSON, converted with
-// scripts/shp2geojson.py). Volcanoes set to null show an empty state.
-export const ASH_DEPOSIT_MODELS = {
-  Kanlaon: { url: './data/kanlaon_ash_deposit_2024-06-03.geojson', title: 'Kanlaon 3 June 2024 Eruption' },
-  Mayon: null,
-  Taal: null,
-};
+// USGS Ash3d deposit models per volcano, newest first. Produced daily from the
+// Google Drive folders by scripts/build-ash-deposits.mjs.
+export const ASH_DEPOSIT_MANIFEST_URL = './data/ash_deposits.json';

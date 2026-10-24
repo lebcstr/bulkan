@@ -141,7 +141,9 @@ body{
   align-items:start;
 }
 #ash-deposit-map{height:620px;border-radius:6px;border:1px solid var(--border)}
-#ash-deposit-body.hidden,.ash-deposit-empty.hidden{display:none}
+#ash-deposit-body.hidden,.ash-deposit-empty.hidden,.ash-run-select.hidden{display:none}
+.ash-deposit-header{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap}
+.ash-run-select{background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:0.3rem 0.5rem;font-family:'JetBrains Mono',monospace;font-size:10px;max-width:100%}
 .ash-deposit-empty{text-align:center;padding:2.5rem 1.25rem;color:var(--text2);font-size:11px}
 .ash-school-box{display:flex;flex-direction:column;height:620px;border:2px solid rgba(255,107,53,0.6);border-radius:10px;padding:0.8rem;background:linear-gradient(135deg,rgba(255,107,53,0.1) 0%,rgba(255,107,53,0.05) 100%)}
 .ash-school-head{flex-shrink:0;border-bottom:2px solid rgba(255,107,53,0.4);padding-bottom:0.4rem;margin-bottom:0.6rem}

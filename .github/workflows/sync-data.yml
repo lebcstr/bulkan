@@ -22,11 +22,21 @@ jobs:
         working-directory: scripts
         run: npm run sync
 
+      # Ash3d deposit models from the per-volcano Google Drive folders. A Drive
+      # failure must not block the sheet snapshot, and leaves the last models in place.
+      - name: Build ash deposit models
+        working-directory: scripts
+        continue-on-error: true
+        env:
+          GDRIVE_SA_KEY: ${{ secrets.GDRIVE_SA_KEY }}
+        run: npm run ash
+
       - name: Commit snapshots
         run: |
           git config user.name  'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           git add frontend/data/*.json
+          git add -A frontend/data/ash
           if git diff --cached --quiet; then
             echo 'No data changes.'
           else

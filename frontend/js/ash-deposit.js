@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { VOLCANO_META, ASH_DEPOSIT_MODELS } from './config.js';
+import { VOLCANO_META, ASH_DEPOSIT_MANIFEST_URL } from './config.js';
 import { calculateDistance } from './schools.js';
 
 // Sequential ramp: thin deposits pale, thick deposits dark.
@@ -14,6 +14,9 @@ const THICKNESS_COLORS = [
 ];
 
 const geojsonCache = {};
+const selectedRun = {};
+let manifestPromise = null;
+let renderToken = 0;
 let ashMap = null;
 let ashLayer = null;
 let ashLegend = null;
@@ -201,12 +204,41 @@ function setHeader(text) {
 
 function showEmpty(vol, message) {
   document.getElementById('ash-deposit-body')?.classList.add('hidden');
+  document.getElementById('ash-deposit-run')?.classList.add('hidden');
   const empty = document.getElementById('ash-deposit-empty');
   if (empty) {
     empty.classList.remove('hidden');
     empty.textContent = message;
   }
   setHeader(vol);
+}
+
+function loadManifest() {
+  manifestPromise ||= fetch(ASH_DEPOSIT_MANIFEST_URL, { cache: 'no-cache' })
+    .then(res => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    })
+    .catch(e => {
+      manifestPromise = null;
+      throw e;
+    });
+  return manifestPromise;
+}
+
+// Run picker in the panel header; only shown when a volcano has several runs.
+function renderRunPicker(vol, models, model) {
+  const select = document.getElementById('ash-deposit-run');
+  if (!select) return;
+  select.classList.toggle('hidden', models.length < 2);
+  select.innerHTML = models.map(m => `
+    <option value="${m.id}" ${m.id === model.id ? 'selected' : ''}>
+      ${m.title} · run ${m.runDate.slice(0, 10)}
+    </option>`).join('');
+  select.onchange = () => {
+    selectedRun[vol] = select.value;
+    updateAshDeposit();
+  };
 }
 
 async function loadGeojson(url) {
@@ -233,27 +265,30 @@ export function initAshDepositMap() {
 export async function updateAshDeposit() {
   if (!ashMap) return;
   const vol = state.currentVolcano;
-  const model = ASH_DEPOSIT_MODELS[vol];
+  const token = ++renderToken;
 
   ashLayer.clearLayers();
   ashLegend?.remove();
   ashLegend = null;
 
-  if (!model) {
-    showEmpty(vol, `No ash deposit model available for ${vol} Volcano.`);
-    return;
-  }
-
-  let geojson;
+  let model, geojson;
   try {
+    const models = (await loadManifest()).models?.[vol] || [];
+    if (token !== renderToken) return;
+    if (models.length === 0) {
+      showEmpty(vol, `No ash deposit model available for ${vol} Volcano.`);
+      return;
+    }
+    model = models.find(m => m.id === selectedRun[vol]) || models[0];
+    renderRunPicker(vol, models, model);
     geojson = await loadGeojson(model.url);
   } catch (e) {
-    console.error(`[ash-deposit] failed to load ${vol} isopachs:`, e);
-    showEmpty(vol, `Ash deposit data for ${vol} Volcano is unavailable.`);
+    console.error(`[ash-deposit] failed to load ${vol} ash deposit model:`, e);
+    if (token === renderToken) showEmpty(vol, `Ash deposit data for ${vol} Volcano is unavailable.`);
     return;
   }
-  // The user may have switched volcano while the file was loading.
-  if (state.currentVolcano !== vol) return;
+  // The user may have switched volcano or run while the file was loading.
+  if (token !== renderToken) return;
   ashLayer.clearLayers();
   ashLegend?.remove();
 
