@@ -18,6 +18,14 @@
         "url": "./data/ash/mayon_20261026T0259Z_run20261026T0259Z.geojson"
       }
     ],
-    "Taal": []
+    "Taal": [
+      {
+        "id": "taal_run20210525T064854Z",
+        "title": "Taal Ash3d Model · 25 May 2021",
+        "eruptionStart": null,
+        "runDate": "2021-05-25T06:48:54.000Z",
+        "url": "./data/ash/taal_run20210525T064854Z.geojson"
+      }
+    ]
   }
 }
