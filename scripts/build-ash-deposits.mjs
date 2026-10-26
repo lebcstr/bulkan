@@ -71,7 +71,7 @@ function driveSource(token) {
       do {
         const params = new URLSearchParams({
           q: `'${folderId}' in parents and trashed = false`,
-          fields: 'nextPageToken, files(id, name, mimeType, createdTime)',
+          fields: 'nextPageToken, files(id, name, mimeType, createdTime, modifiedTime)',
           pageSize: '1000',
           supportsAllDrives: 'true',
           includeItemsFromAllDrives: 'true',
@@ -94,12 +94,16 @@ function localSource() {
   return {
     async list(dir) {
       const entries = await readdir(dir, { withFileTypes: true });
-      return Promise.all(entries.filter(e => !e.name.startsWith('.')).map(async e => ({
-        id: join(dir, e.name),
-        name: e.name,
-        isFolder: e.isDirectory(),
-        createdTime: (await stat(join(dir, e.name))).birthtime.toISOString(),
-      })));
+      return Promise.all(entries.filter(e => !e.name.startsWith('.')).map(async e => {
+        const s = await stat(join(dir, e.name));
+        return {
+          id: join(dir, e.name),
+          name: e.name,
+          isFolder: e.isDirectory(),
+          createdTime: s.birthtime.toISOString(),
+          modifiedTime: s.mtime.toISOString(),
+        };
+      }));
     },
     download: file => readFile(file.id),
   };
@@ -124,10 +128,17 @@ function unzip(buf) {
     const name = buf.toString('utf8', p + 46, p + 46 + nameLen);
     const start = local + 30 + buf.readUInt16LE(local + 26) + buf.readUInt16LE(local + 28);
     const data = buf.subarray(start, start + size);
-    files[name] = method === 8 ? inflateRawSync(data) : data;
+    files[name] = { data: method === 8 ? inflateRawSync(data) : data, mtime: dosTime(buf, p + 12) };
     p += 46 + nameLen + extraLen + commentLen;
   }
   return files;
+}
+
+// Zip entries store an MS-DOS local timestamp; treated as UTC.
+function dosTime(buf, at) {
+  const t = buf.readUInt16LE(at);
+  const d = buf.readUInt16LE(at + 2);
+  return new Date(Date.UTC(1980 + (d >> 9), ((d >> 5) & 15) - 1, d & 31, t >> 11, (t >> 5) & 63, (t & 31) * 2)).toISOString();
 }
 
 function readDbf(buf) {
@@ -204,7 +215,12 @@ async function collect(source, folderId, path) {
   const found = [];
   for (const { shp, dbf } of pairShapefiles(files)) {
     if (!dbf) { console.warn(`[skip] ${path}/${shp.name}: no matching .dbf`); continue; }
-    found.push({ origin: `${path}/${shp.name}`, shp: await source.download(shp), dbf: await source.download(dbf) });
+    found.push({
+      origin: `${path}/${shp.name}`,
+      shp: await source.download(shp),
+      dbf: await source.download(dbf),
+      fileTime: shp.modifiedTime || shp.createdTime,
+    });
   }
   for (const zip of files.filter(f => ext(f.name) === 'zip')) {
     const entries = unzip(await source.download(zip));
@@ -212,7 +228,12 @@ async function collect(source, folderId, path) {
     for (const name of names.filter(n => ext(n) === 'shp')) {
       const dbf = names.find(n => ext(n) === 'dbf' && n.slice(0, -4).toLowerCase() === name.slice(0, -4).toLowerCase());
       if (!dbf) { console.warn(`[skip] ${path}/${zip.name}:${name}: no matching .dbf`); continue; }
-      found.push({ origin: `${path}/${zip.name}:${name}`, shp: entries[name], dbf: entries[dbf] });
+      found.push({
+        origin: `${path}/${zip.name}:${name}`,
+        shp: entries[name].data,
+        dbf: entries[dbf].data,
+        fileTime: entries[name].mtime,
+      });
     }
   }
   for (const sub of files.filter(f => f.isFolder)) {
@@ -225,20 +246,47 @@ async function collect(source, folderId, path) {
 
 const compactTime = iso => iso.replace(/[-:]/g, '').replace(/\.\d+/, '').replace(/00Z$/, 'Z');
 
-function titleFor(volcano, eruptionStart) {
-  const date = new Intl.DateTimeFormat('en-GB', {
-    day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Manila',
-  }).format(new Date(eruptionStart));
-  return `${volcano} ${date} Eruption`;
-}
+const formatDate = iso => new Intl.DateTimeFormat('en-GB', {
+  day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Manila',
+}).format(new Date(iso));
 
-function convert(volcano, { origin, shp, dbf }) {
-  const rows = readDbf(dbf);
+// Brings both Ash3d shapefile layouts to the current one's attributes:
+// - current: VOLC, VAR, VALUE, UNITS, INDEX, E_STIME, RUN DATE, ... per contour
+// - older export (dp_mm.*): only name ("<Volcano>_Deposit_mm"), value, index;
+//   no eruption or run times, so the run date falls back to the file timestamp.
+function normalizeRows(rows, origin, fileTime) {
   const first = rows[0];
-  if (!first || first.VAR !== DEPOSIT_VAR) {
-    console.warn(`[skip] ${origin}: VAR is "${first?.VAR}", not "${DEPOSIT_VAR}"`);
+  if (!first) {
+    console.warn(`[skip] ${origin}: .dbf has no records`);
     return null;
   }
+  if ('VAR' in first) {
+    if (first.VAR !== DEPOSIT_VAR) {
+      console.warn(`[skip] ${origin}: VAR is "${first.VAR}", not "${DEPOSIT_VAR}"`);
+      return null;
+    }
+    return rows;
+  }
+  const legacy = String(first.name ?? '').trim().match(/^(.+?)_Deposit_mm$/i);
+  if (legacy && 'value' in first) {
+    const ranked = [...new Set(rows.map(r => r.value))].sort((a, b) => a - b);
+    return rows.map(r => ({
+      VOLC: legacy[1].replace(/_/g, ' '),
+      VAR: DEPOSIT_VAR,
+      VALUE: r.value,
+      UNITS: 'mm',
+      INDEX: ranked.indexOf(r.value),
+      'RUN DATE': fileTime,
+    }));
+  }
+  console.warn(`[skip] ${origin}: not an Ash3d deposit thickness shapefile (columns: ${Object.keys(first).join(', ')})`);
+  return null;
+}
+
+function convert(volcano, { origin, shp, dbf, fileTime }) {
+  const rows = normalizeRows(readDbf(dbf), origin, fileTime);
+  if (!rows) return null;
+  const first = rows[0];
   if (String(first.VOLC).trim().toLowerCase() !== volcano.toLowerCase()) {
     console.warn(`[skip] ${origin}: model is for "${first.VOLC}" but is in the ${volcano} folder`);
     return null;
@@ -246,13 +294,17 @@ function convert(volcano, { origin, shp, dbf }) {
   const geoms = readShp(shp);
   if (geoms.length !== rows.length) throw new Error(`${origin}: ${geoms.length} shapes but ${rows.length} records`);
 
-  const id = `${volcano.toLowerCase()}_${compactTime(first.E_STIME)}_run${compactTime(first['RUN DATE'])}`;
+  const eruptionStart = first.E_STIME || null;
+  const runDate = first['RUN DATE'];
+  const id = `${volcano.toLowerCase()}_${eruptionStart ? `${compactTime(eruptionStart)}_` : ''}run${compactTime(runDate)}`;
   return {
     entry: {
       id,
-      title: titleFor(volcano, first.E_STIME),
-      eruptionStart: first.E_STIME,
-      runDate: first['RUN DATE'],
+      title: eruptionStart
+        ? `${volcano} ${formatDate(eruptionStart)} Eruption`
+        : `${volcano} Ash3d Model · ${formatDate(runDate)}`,
+      eruptionStart,
+      runDate,
       url: `./data/ash/${id}.geojson`,
     },
     geojson: {
@@ -285,8 +337,9 @@ async function main() {
       outputs.push(result);
       console.log(`[${volcano}] ${result.entry.title} (${result.geojson.features.length} isopachs) ← ${shapefile.origin}`);
     }
-    // Newest eruption first, then newest model run.
-    list.sort((a, b) => b.eruptionStart.localeCompare(a.eruptionStart) || b.runDate.localeCompare(a.runDate));
+    // Newest eruption first (run date when the eruption time is unknown), then newest run.
+    const when = m => m.eruptionStart || m.runDate;
+    list.sort((a, b) => when(b).localeCompare(when(a)) || b.runDate.localeCompare(a.runDate));
   }
 
   await rm(OUT_DIR, { recursive: true, force: true });

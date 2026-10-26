@@ -79,6 +79,7 @@ Upload the Ash3d deposit shapefile to the volcano's Google Drive folder, as the 
 The daily **Sync Sheets Data** workflow (09:00 PH time) picks it up and redeploys. To publish immediately, run that workflow from the Actions tab.
 
 - Volcano, eruption time and run date are read from the shapefile itself; file names don't matter.
+- Older Ash3d exports (`dp_mm.*`, columns `name`/`value`/`index` only) also work. They carry no eruption parameters, so the run date comes from the file timestamp and the model is titled "<Volcano> Ash3d Model · <date>".
 - A model whose volcano doesn't match its folder is skipped (see the workflow log).
 - The newest eruption is shown by default; older runs appear in the panel's dropdown.
 - Deleting a file from Drive removes that model on the next run. If Drive can't be read, the last published models stay up.

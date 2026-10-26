@@ -3,3 +3,7 @@ node_modules/
 *.log
 .env
 .env.local
+
+# Google Cloud service account keys (GDRIVE_SA_KEY lives in GitHub secrets)
+upri-bulkan-*.json
+*service-account*.json
