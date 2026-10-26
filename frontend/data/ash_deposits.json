@@ -9,7 +9,15 @@
         "url": "./data/ash/kanlaon_20240603T1051Z_run20260511T0256Z.geojson"
       }
     ],
-    "Mayon": [],
+    "Mayon": [
+      {
+        "id": "mayon_20261026T0259Z_run20261026T0259Z",
+        "title": "Mayon 26 October 2026 Eruption",
+        "eruptionStart": "2026-10-26T02:59:00Z",
+        "runDate": "2026-10-26T02:59:00Z",
+        "url": "./data/ash/mayon_20261026T0259Z_run20261026T0259Z.geojson"
+      }
+    ],
     "Taal": []
   }
 }
