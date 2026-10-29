@@ -29,8 +29,9 @@ Static dashboard that shows PHIVOLCS-style monitoring data (VEQ, Rockfall, PDC, 
 │       ├── kanlaon.json / mayon.json / taal.json   (produced by scripts)
 │       ├── ash_deposits.json + ash/*.geojson       (produced by scripts)
 ├── scripts/
-│   ├── sync-sheets.mjs    Node 20 script: Google Sheets gviz → JSON
+│   ├── sync-sheets.mjs    Node 20 script: Google Sheets API → JSON
 │   ├── build-ash-deposits.mjs  Ash3d shapefiles (Google Drive) → GeoJSON
+│   ├── google-auth.mjs    service-account token for both scripts
 │   └── package.json
 └── .github/workflows/
     ├── sync-data.yml      cron: daily sheet pull → commits data/*.json
@@ -49,18 +50,30 @@ python3 -m http.server 8082
 
 ## Refresh data manually
 
+Both scripts need the service account's JSON key in `GDRIVE_SA_KEY` (see [Google access](#google-access)). Run them from `scripts/`, where `package.json` lives.
+
 ```bash
 cd scripts
-npm run sync
+GDRIVE_SA_KEY="$(cat path/to/key.json)" npm run sync
 # writes frontend/data/{kanlaon,mayon,taal}.json
 ```
+
+PowerShell:
+
+```powershell
+cd scripts
+$env:GDRIVE_SA_KEY = Get-Content path\to\key.json -Raw
+npm run sync
+```
+
+This overwrites the committed snapshots, so check `git diff` before committing. Keep the key file outside the repo.
 
 ## Deploy to GitHub Pages
 
 1. Push to a GitHub repo (`main` branch).
 2. **Settings → Pages → Build and deployment → Source: GitHub Actions**.
 3. The `deploy-pages.yml` workflow publishes `frontend/` on every push to `main` and after a successful data sync.
-4. The `sync-data.yml` workflow runs daily at 20:00 UTC (≈ 04:00 PH time) and commits refreshed snapshots. You can trigger it manually from the Actions tab.
+4. The `sync-data.yml` workflow runs daily at 01:00 UTC (09:00 PH time, ~30 min after the source sheets refresh) and commits refreshed snapshots. You can trigger it manually from the Actions tab. It needs the `GDRIVE_SA_KEY` repository secret.
 
 ## Ash deposit models (USGS Ash3d)
 
@@ -84,9 +97,7 @@ The daily **Sync Sheets Data** workflow (09:00 PH time) picks it up and redeploy
 - The newest eruption is shown by default; older runs appear in the panel's dropdown.
 - Deleting a file from Drive removes that model on the next run. If Drive can't be read, the last published models stay up.
 
-### Access
-
-The folders are private and shared (Viewer) with a Google Cloud service account. Its JSON key is stored as the repository secret `GDRIVE_SA_KEY`. To rotate it: create a new key on the service account, replace the secret, then delete the old key.
+The folders are private and read with the service account (see [Google access](#google-access)).
 
 ### Run locally
 
@@ -100,18 +111,55 @@ node build-ash-deposits.mjs --local <dir>
 
 ## Data sources
 
-Volcano records are pulled from Google Sheets via the public `gviz/tq` endpoint. Each sheet must be shared as **"Anyone with the link → Viewer"**.
+Volcano records come from the automated monitoring Google Sheets, read with the Sheets API v4 as the service account. The sheets stay private; they only need to be shared (Viewer) with the service account.
 
-| Volcano | Sheet ID | Tab | Column map |
+| Volcano | Sheet ID | Tab |
+|---|---|---|
+| Kanlaon | `1OHHgo043us1oTq_5gg8r8aKo2h3EbQQVjHnoVpV4WYM` | `Sheet1` |
+| Mayon   | `19_dxIPl5COPnlACF0at0ZqdFss5sGH3HWBaDFn2_2Cs` | `Sheet1` |
+| Taal    | `170KpOGupG9ijfSqptHpFW2DpEr-h0iIigiMq6neeuYQ` | `SinceJan13` |
+
+Columns are mapped **by position**, so inserting or reordering a column in a sheet shifts the data. Row 1 is the header and is skipped.
+
+| Field | Kanlaon | Mayon | Taal |
 |---|---|---|---|
-| Kanlaon | `18TGh3YbQEKVoX9Htk9MtOoB6RnuPwiisvbXVMpLM1WA` | `Sheet1` | `KANLAON` (AlertLevel=A, DATE=B, Earthquakes=C, SO₂=G, Plume=H) |
-| Mayon   | `1OHHgo043us1oTq_5gg8r8aKo2h3EbQQVjHnoVpV4WYM` | `Mayon` | `DEFAULT` |
-| Taal    | `1OHHgo043us1oTq_5gg8r8aKo2h3EbQQVjHnoVpV4WYM` | `Taal`  | `DEFAULT` |
+| AlertLevel | B | A | A |
+| DATE | C | B | B |
+| VEQ | D | C | F |
+| VolcanicTremors | – | D | G |
+| Rockfall | – | E | – |
+| PDCEvents | – | F | F |
+| SO2Flux | H | H | C |
+| PlumeHeight | I | I | J |
+| STALTA | N | – | – |
+| Eruption | K | K | L |
 
-To change a source, edit `VOLCANO_SOURCES` in `scripts/sync-sheets.mjs`.
+- Dates may be real date cells or text; date cells are written as `YYYY-MM-DD`.
+- A day is flagged `eruption: 1` when its Eruption cell contains the word "eruption".
+- Fields with no column (–) are written as empty strings.
+
+To change a source or a column, edit `VOLCANO_SOURCES` / `COLUMN_INDICES_*` in `scripts/sync-sheets.mjs`.
+
+## Google access
+
+Both scripts authenticate as one Google Cloud service account. Its JSON key is the repository secret `GDRIVE_SA_KEY`, and the same value is used locally.
+
+- **Sharing:** share each sheet and each Ash3d Drive folder with the service account's `client_email` (Viewer).
+- **APIs:** the **Google Sheets API** and **Google Drive API** must both be enabled in the service account's project.
+- **Native Sheets only:** an uploaded `.xlsx` can't be read by the Sheets API; convert it with *File → Save as Google Sheets*.
+- **Cost:** both APIs are free; usage (a few requests a day) is far below quota.
+- **Rotating the key:** create a new key on the service account, replace the secret, then delete the old key.
+
+Common errors:
+
+| Error | Cause |
+|---|---|
+| `GDRIVE_SA_KEY is not set` | env variable / secret missing |
+| `403 … has not been used in project` | Sheets or Drive API not enabled |
+| `403 The caller does not have permission` | file not shared with the service account |
+| `400 This operation is not supported for this document` | file is an `.xlsx`, not a Google Sheet |
 
 ## Known gaps
 
-- **Mayon/Taal sheet is private.** `scripts/sync-sheets.mjs` currently returns `HTTP 401` for both. Either share that sheet as "Anyone with the link → Viewer", or point them at a different source. Kanlaon syncs cleanly (~1850 rows).
-- **Kanlaon columns D/E/F** in the source sheet are unlabeled, so `VolcanicTremors`, `Rockfall`, and `PDCEvents` are left empty for Kanlaon. If any of those three correspond to a real column, update `COLUMN_INDICES_KANLAON` in `scripts/sync-sheets.mjs` **and** `frontend/js` (if ever re-added).
+- **Kanlaon** has no columns mapped for `VolcanicTremors`, `Rockfall`, or `PDCEvents`, so those stay empty. If the sheet gains them, update `COLUMN_INDICES_KANLAON`.
 - **Two legacy HTML files** (`Bulkan Latest.html`, `Volcano Embed HTML.html`) still live at the repo root. They are the pre-split monoliths — keep them for reference or move to an `archive/` folder.
