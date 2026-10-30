@@ -1,6 +1,6 @@
 {
   "volcano": "taal",
-  "syncedAt": "2026-10-27T08:21:49.825Z",
+  "syncedAt": "2026-10-30T05:59:26.908Z",
   "records": [
     {
       "DATE": "DATE",
@@ -29747,6 +29747,42 @@
       "PDCEvents": 9,
       "SO2Flux": 557,
       "PlumeHeight": 900,
+      "STALTA": "",
+      "eruption": 0
+    },
+    {
+      "DATE": "2026-10-27",
+      "AlertLevel": 1,
+      "VEQ": 13,
+      "VolcanicTremors": 0,
+      "Rockfall": "",
+      "PDCEvents": 13,
+      "SO2Flux": 557,
+      "PlumeHeight": 600,
+      "STALTA": "",
+      "eruption": 0
+    },
+    {
+      "DATE": "2026-10-28",
+      "AlertLevel": 1,
+      "VEQ": 8,
+      "VolcanicTremors": 0,
+      "Rockfall": "",
+      "PDCEvents": 8,
+      "SO2Flux": 424,
+      "PlumeHeight": "",
+      "STALTA": "",
+      "eruption": 0
+    },
+    {
+      "DATE": "2026-10-29",
+      "AlertLevel": 1,
+      "VEQ": 10,
+      "VolcanicTremors": 0,
+      "Rockfall": "",
+      "PDCEvents": 10,
+      "SO2Flux": 424,
+      "PlumeHeight": "",
       "STALTA": "",
       "eruption": 0
     }
