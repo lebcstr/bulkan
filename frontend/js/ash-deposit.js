@@ -10,7 +10,6 @@ const SCHOOLS_PER_BAND = 100;
 
 const geojsonCache = {};
 const selectedRun = {};
-let schoolRenderer = null;
 let manifestPromise = null;
 let renderToken = 0;
 let ashMap = null;
@@ -133,7 +132,6 @@ function addSchoolMarkers(schools, values) {
   for (const s of schools) {
     const color = colorFor(s.thickness);
     const marker = L.circleMarker([s.lat, s.lng], {
-      renderer: schoolRenderer,
       radius: dense ? 3 : 5, fillColor: color, color: '#e8eaf0', weight: dense ? 0.5 : 1.5, fillOpacity: 0.95,
     });
     marker.bindPopup(() => `
@@ -150,7 +148,8 @@ function addSchoolMarkers(schools, values) {
           <div style="padding-top:0.5rem;border-top:1px solid var(--border);margin-top:0.5rem;font-size:10px;color:#8892a8;">${s.distance.toFixed(1)} km from vent${s.municipality ? ` • ${s.municipality}` : ''}</div>
         </div>
       </div>
-    `, { maxWidth: 260, className: 'custom-popup' });
+    `, { maxWidth: 260, className: 'custom-popup', autoPan: false });
+    marker.on('click', () => ashMap.flyTo(marker.getLatLng(), Math.max(ashMap.getZoom(), 13), { duration: 0.8 }));
     marker.addTo(ashLayer);
     markers[s.id] = marker;
   }
@@ -230,7 +229,7 @@ function renderInfo(props, model, values) {
 
 function setHeader(text) {
   const el = document.getElementById('ash-deposit-title');
-  if (el) el.textContent = `🌋 ASH DEPOSIT MODEL · ${text.toUpperCase()}`;
+  if (el) el.textContent = `Ashfall Dispersal Simulation · ${text.toUpperCase()}`;
 }
 
 function showEmpty(vol, message) {
@@ -284,13 +283,14 @@ async function loadGeojson(url) {
 export function initAshDepositMap() {
   const container = document.getElementById('ash-deposit-map');
   if (!container) return;
-  ashMap = L.map(container, { scrollWheelZoom: false });
+  // One shared canvas for bands, contours and schools: draw order is click
+  // order, so schools (added after the deposit) sit on top and take the click.
+  ashMap = L.map(container, { scrollWheelZoom: false, renderer: L.canvas({ padding: 0.5 }) });
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '© OpenStreetMap · Ash3d © USGS',
   }).addTo(ashMap);
   ashLayer = L.layerGroup().addTo(ashMap);
-  schoolRenderer = L.canvas({ padding: 0.5 });
   updateAshDeposit();
 }
 
@@ -357,5 +357,5 @@ export async function updateAshDeposit() {
 
   ashLegend = makeLegend(values).addTo(ashMap);
   renderSchoolBox(schools, values, markers);
-  renderInfo(geojson.features[0].properties, model, values);
+  //renderInfo(geojson.features[0].properties, model, values);
 }

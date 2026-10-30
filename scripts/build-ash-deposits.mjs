@@ -10,10 +10,10 @@
 // Local testing: `node build-ash-deposits.mjs --local <dir>` reads
 // <dir>/<Volcano>/ instead of Drive.
 import { readFile, writeFile, readdir, mkdir, rm, stat } from 'node:fs/promises';
-import { createSign } from 'node:crypto';
 import { inflateRawSync } from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { getAccessToken } from './google-auth.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = join(__dirname, '..', 'frontend', 'data');
@@ -31,32 +31,6 @@ const FOLDER_MIME = 'application/vnd.google-apps.folder';
 const DRIVE_API = 'https://www.googleapis.com/drive/v3/files';
 
 // ── Google Drive ────────────────────────────────────────────────────────────
-
-async function getAccessToken() {
-  const raw = process.env.GDRIVE_SA_KEY;
-  if (!raw) throw new Error('GDRIVE_SA_KEY is not set');
-  const key = JSON.parse(raw);
-  const now = Math.floor(Date.now() / 1000);
-  const b64 = obj => Buffer.from(JSON.stringify(obj)).toString('base64url');
-  const unsigned = `${b64({ alg: 'RS256', typ: 'JWT' })}.${b64({
-    iss: key.client_email,
-    scope: 'https://www.googleapis.com/auth/drive.readonly',
-    aud: key.token_uri,
-    iat: now,
-    exp: now + 3600,
-  })}`;
-  const signature = createSign('RSA-SHA256').update(unsigned).sign(key.private_key, 'base64url');
-  const res = await fetch(key.token_uri, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-      assertion: `${unsigned}.${signature}`,
-    }),
-  });
-  if (!res.ok) throw new Error(`token request failed: HTTP ${res.status} ${await res.text()}`);
-  return (await res.json()).access_token;
-}
 
 function driveSource(token) {
   const get = async (url) => {
@@ -317,7 +291,9 @@ function convert(volcano, { origin, shp, dbf, fileTime }) {
 async function main() {
   const localIdx = process.argv.indexOf('--local');
   const localDir = localIdx !== -1 ? process.argv[localIdx + 1] : null;
-  const source = localDir ? localSource() : driveSource(await getAccessToken());
+  const source = localDir
+    ? localSource()
+    : driveSource(await getAccessToken('https://www.googleapis.com/auth/drive.readonly'));
 
   // Convert everything in memory first so a Drive failure leaves the
   // previously published models untouched.

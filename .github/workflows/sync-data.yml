@@ -20,6 +20,8 @@ jobs:
 
       - name: Run sync
         working-directory: scripts
+        env:
+          GDRIVE_SA_KEY: ${{ secrets.GDRIVE_SA_KEY }}
         run: npm run sync
 
       # Ash3d deposit models from the per-volcano Google Drive folders. A Drive

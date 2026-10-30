@@ -2,13 +2,19 @@
 import { writeFile, mkdir } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { getAccessToken } from './google-auth.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT_DIR = join(__dirname, '..', 'frontend', 'data');
 
-const COLUMN_INDICES_DEFAULT = {
-  DATE: 0, AlertLevel: 1, VEQ: 2, VolcanicTremors: 3,
-  Rockfall: 4, PDCEvents: 5, SO2Flux: 6, PlumeHeight: 7, STALTA: null,
+const COLUMN_INDICES_TAAL = {
+  DATE: 1, AlertLevel: 0, VEQ: 5, VolcanicTremors: 6,
+  Rockfall: null, PDCEvents: 5, SO2Flux: 2, PlumeHeight: 9, STALTA: null, Eruption: 11
+};
+
+const COLUMN_INDICES_MAYON = {
+  DATE: 1, AlertLevel: 0, VEQ: 2, VolcanicTremors: 3,
+  Rockfall: 4, PDCEvents: 5, SO2Flux: 7, PlumeHeight: 8, STALTA: null, Eruption: 10
 };
 
 const COLUMN_INDICES_KANLAON = {
@@ -18,35 +24,39 @@ const COLUMN_INDICES_KANLAON = {
 
 const VOLCANO_SOURCES = {
   kanlaon: {
-    sheetId: '1WJImbfbuHfn7YqitoCFrHEIm1eSLvXtOvTTx49C8cw8',
+    sheetId: '1OHHgo043us1oTq_5gg8r8aKo2h3EbQQVjHnoVpV4WYM',
     tab: 'Sheet1',
     columns: COLUMN_INDICES_KANLAON,
   },
   mayon: {
-    sheetId: '1nQOK3UgNOcYA1ywNl6OHR5vNNcK92Ff4',
-    tab: 'Mayon',
-    columns: COLUMN_INDICES_DEFAULT,
+    sheetId: '19_dxIPl5COPnlACF0at0ZqdFss5sGH3HWBaDFn2_2Cs',
+    tab: 'Sheet1',
+    columns: COLUMN_INDICES_MAYON,
   },
   taal: {
-    sheetId: '1nQOK3UgNOcYA1ywNl6OHR5vNNcK92Ff4',
-    tab: 'Taal',
-    columns: COLUMN_INDICES_DEFAULT,
+    sheetId: '170KpOGupG9ijfSqptHpFW2DpEr-h0iIigiMq6neeuYQ',
+    tab: 'SinceJan13',
+    columns: COLUMN_INDICES_TAAL,
   },
 };
 
-async function fetchSheet(sheetId, tab) {
-  const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(tab)}&headers=1`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`HTTP ${res.status} for ${tab}`);
-  const text = await res.text();
-  const start = text.indexOf('{');
-  const end = text.lastIndexOf('}');
-  if (start < 0 || end < 0) throw new Error(`Malformed gviz response for ${tab}`);
-  const payload = JSON.parse(text.slice(start, end + 1));
-  if (payload.status === 'error') {
-    throw new Error(payload.errors?.[0]?.message || 'gviz error');
-  }
-  return payload.table;
+const SHEETS_API = 'https://sheets.googleapis.com/v4/spreadsheets';
+const SHEETS_SCOPE = 'https://www.googleapis.com/auth/spreadsheets.readonly';
+
+// Returns the tab's rows below the header row. Values come unformatted, with
+// dates as serial day numbers (see normalizeDate).
+async function fetchSheet(token, sheetId, tab) {
+  const range = encodeURIComponent(`'${tab.replace(/'/g, "''")}'`);
+  const params = new URLSearchParams({
+    valueRenderOption: 'UNFORMATTED_VALUE',
+    dateTimeRenderOption: 'SERIAL_NUMBER',
+  });
+  const res = await fetch(`${SHEETS_API}/${sheetId}/values/${range}?${params}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(`Sheets ${tab}: HTTP ${res.status} ${await res.text()}`);
+  const { values = [] } = await res.json();
+  return values.slice(1);
 }
 
 // Eruption days are rows whose Eruption cell mentions the word "eruption".
@@ -54,20 +64,10 @@ function isEruption(cell) {
   return /eruption/i.test(String(cell ?? ''));
 }
 
-function parseRows(table) {
-  if (!table?.rows) return [];
-  return table.rows.map(r => (r.c || []).map(c => c ? (c.v ?? c.f ?? '') : ''));
-}
-
+// Sheets date cells are days since 1899-12-30; text dates pass through.
 function normalizeDate(v) {
-  if (typeof v === 'string' && v.startsWith('Date(')) {
-    const m = v.match(/Date\((\d+),(\d+),(\d+)/);
-    if (m) {
-      const y = m[1];
-      const mo = String(parseInt(m[2], 10) + 1).padStart(2, '0');
-      const d = String(parseInt(m[3], 10)).padStart(2, '0');
-      return `${y}-${mo}-${d}`;
-    }
+  if (typeof v === 'number') {
+    return new Date(Date.UTC(1899, 11, 30) + Math.floor(v) * 86400000).toISOString().slice(0, 10);
   }
   return v;
 }
@@ -91,9 +91,8 @@ function rowsToObjects(rows, cols) {
   }));
 }
 
-async function syncOne(name, source) {
-  const table = await fetchSheet(source.sheetId, source.tab);
-  const rows = parseRows(table);
+async function syncOne(token, name, source) {
+  const rows = await fetchSheet(token, source.sheetId, source.tab);
   const records = rowsToObjects(rows, source.columns)
     .filter(r => r.DATE !== '' && r.DATE !== null);
   if (source.columns.Eruption != null) {
@@ -114,8 +113,9 @@ async function syncOne(name, source) {
 
 async function main() {
   await mkdir(OUT_DIR, { recursive: true });
+  const token = await getAccessToken(SHEETS_SCOPE);
   const results = await Promise.allSettled(
-    Object.entries(VOLCANO_SOURCES).map(([name, src]) => syncOne(name, src))
+    Object.entries(VOLCANO_SOURCES).map(([name, src]) => syncOne(token, name, src))
   );
   const failed = results.filter(r => r.status === 'rejected');
   for (const r of failed) console.error('FAIL:', r.reason?.message || r.reason);
