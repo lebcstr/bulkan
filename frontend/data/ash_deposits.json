@@ -11,6 +11,13 @@
     ],
     "Mayon": [
       {
+        "id": "mayon_20261030T0352Z_run20261031T0259Z",
+        "title": "Mayon 30 October 2026 Eruption",
+        "eruptionStart": "2026-10-30T03:52:00Z",
+        "runDate": "2026-10-31T02:59:00Z",
+        "url": "./data/ash/mayon_20261030T0352Z_run20261031T0259Z.geojson"
+      },
+      {
         "id": "mayon_20261030T0352Z_run20261030T0510Z",
         "title": "Mayon 30 October 2026 Eruption",
         "eruptionStart": "2026-10-30T03:52:00Z",

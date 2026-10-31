@@ -1,6 +1,6 @@
 {
   "volcano": "mayon",
-  "syncedAt": "2026-10-30T06:56:28.913Z",
+  "syncedAt": "2026-10-31T06:00:02.736Z",
   "records": [
     {
       "DATE": "2022-08-21",
@@ -15712,7 +15712,7 @@
     },
     {
       "DATE": "2026-03-23",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 180,
       "VolcanicTremors": 0,
       "Rockfall": 327,
@@ -15724,7 +15724,7 @@
     },
     {
       "DATE": "2026-03-24",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 159,
       "VolcanicTremors": 4,
       "Rockfall": 300,
@@ -15736,7 +15736,7 @@
     },
     {
       "DATE": "2026-03-25",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 92,
       "VolcanicTremors": 3,
       "Rockfall": 301,
@@ -15748,7 +15748,7 @@
     },
     {
       "DATE": "2026-03-26",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 63,
       "VolcanicTremors": 1,
       "Rockfall": 287,
@@ -15760,7 +15760,7 @@
     },
     {
       "DATE": "2026-03-27",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 111,
       "VolcanicTremors": 9,
       "Rockfall": 280,
@@ -15772,7 +15772,7 @@
     },
     {
       "DATE": "2026-03-28",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 188,
       "VolcanicTremors": 6,
       "Rockfall": 266,
@@ -15784,7 +15784,7 @@
     },
     {
       "DATE": "2026-03-29",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 173,
       "VolcanicTremors": 21,
       "Rockfall": 221,
@@ -15796,7 +15796,7 @@
     },
     {
       "DATE": "2026-03-30",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 208,
       "VolcanicTremors": 18,
       "Rockfall": 165,
@@ -15808,7 +15808,7 @@
     },
     {
       "DATE": "2026-03-31",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 195,
       "VolcanicTremors": 9,
       "Rockfall": 222,
@@ -15820,7 +15820,7 @@
     },
     {
       "DATE": "2026-04-01",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 116,
       "VolcanicTremors": 19,
       "Rockfall": 296,
@@ -15832,7 +15832,7 @@
     },
     {
       "DATE": "2026-04-02",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 101,
       "VolcanicTremors": 12,
       "Rockfall": 283,
@@ -15844,7 +15844,7 @@
     },
     {
       "DATE": "2026-04-03",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 52,
       "VolcanicTremors": 1,
       "Rockfall": 356,
@@ -15856,7 +15856,7 @@
     },
     {
       "DATE": "2026-04-04",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 32,
       "VolcanicTremors": 0,
       "Rockfall": 330,
@@ -15868,7 +15868,7 @@
     },
     {
       "DATE": "2026-04-05",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 159,
       "VolcanicTremors": 0,
       "Rockfall": 344,
@@ -15880,7 +15880,7 @@
     },
     {
       "DATE": "2026-04-06",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 77,
       "VolcanicTremors": 3,
       "Rockfall": 308,
@@ -15892,7 +15892,7 @@
     },
     {
       "DATE": "2026-04-07",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 117,
       "VolcanicTremors": 12,
       "Rockfall": 295,
@@ -15904,7 +15904,7 @@
     },
     {
       "DATE": "2026-04-08",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 124,
       "VolcanicTremors": 9,
       "Rockfall": 217,
@@ -15916,7 +15916,7 @@
     },
     {
       "DATE": "2026-04-09",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 71,
       "VolcanicTremors": 8,
       "Rockfall": 284,
@@ -15928,7 +15928,7 @@
     },
     {
       "DATE": "2026-04-10",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 254,
       "VolcanicTremors": 36,
       "Rockfall": 287,
@@ -15940,7 +15940,7 @@
     },
     {
       "DATE": "2026-04-11",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 131,
       "VolcanicTremors": 20,
       "Rockfall": 233,
@@ -15952,7 +15952,7 @@
     },
     {
       "DATE": "2026-04-12",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 34,
       "VolcanicTremors": 5,
       "Rockfall": 269,
@@ -15964,7 +15964,7 @@
     },
     {
       "DATE": "2026-04-13",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 87,
       "VolcanicTremors": 16,
       "Rockfall": 169,
@@ -15976,7 +15976,7 @@
     },
     {
       "DATE": "2026-04-14",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 69,
       "VolcanicTremors": 9,
       "Rockfall": 283,
@@ -15988,7 +15988,7 @@
     },
     {
       "DATE": "2026-04-15",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 66,
       "VolcanicTremors": 17,
       "Rockfall": 304,
@@ -16000,7 +16000,7 @@
     },
     {
       "DATE": "2026-04-16",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 123,
       "VolcanicTremors": 26,
       "Rockfall": 251,
@@ -16012,7 +16012,7 @@
     },
     {
       "DATE": "2026-04-17",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 86,
       "VolcanicTremors": 27,
       "Rockfall": 383,
@@ -16024,7 +16024,7 @@
     },
     {
       "DATE": "2026-04-18",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 41,
       "VolcanicTremors": 16,
       "Rockfall": 440,
@@ -16036,7 +16036,7 @@
     },
     {
       "DATE": "2026-04-19",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 64,
       "VolcanicTremors": 32,
       "Rockfall": 356,
@@ -16048,7 +16048,7 @@
     },
     {
       "DATE": "2026-04-20",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 52,
       "VolcanicTremors": 34,
       "Rockfall": 267,
@@ -16060,7 +16060,7 @@
     },
     {
       "DATE": "2026-04-21",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 51,
       "VolcanicTremors": 35,
       "Rockfall": 291,
@@ -16072,7 +16072,7 @@
     },
     {
       "DATE": "2026-04-22",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 47,
       "VolcanicTremors": 26,
       "Rockfall": 223,
@@ -16084,7 +16084,7 @@
     },
     {
       "DATE": "2026-04-23",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 29,
       "VolcanicTremors": 16,
       "Rockfall": 195,
@@ -16096,7 +16096,7 @@
     },
     {
       "DATE": "2026-04-24",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 62,
       "VolcanicTremors": 45,
       "Rockfall": 238,
@@ -16108,7 +16108,7 @@
     },
     {
       "DATE": "2026-04-25",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 40,
       "VolcanicTremors": 19,
       "Rockfall": 238,
@@ -16120,7 +16120,7 @@
     },
     {
       "DATE": "2026-04-26",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 42,
       "VolcanicTremors": 29,
       "Rockfall": 262,
@@ -16132,7 +16132,7 @@
     },
     {
       "DATE": "2026-04-27",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 35,
       "VolcanicTremors": 30,
       "Rockfall": 281,
@@ -16144,7 +16144,7 @@
     },
     {
       "DATE": "2026-04-28",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 12,
       "VolcanicTremors": 8,
       "Rockfall": 377,
@@ -16156,7 +16156,7 @@
     },
     {
       "DATE": "2026-04-29",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 45,
       "VolcanicTremors": 32,
       "Rockfall": 307,
@@ -16168,7 +16168,7 @@
     },
     {
       "DATE": "2026-04-30",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 28,
       "VolcanicTremors": 13,
       "Rockfall": 221,
@@ -16180,7 +16180,7 @@
     },
     {
       "DATE": "2026-05-01",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 39,
       "VolcanicTremors": 21,
       "Rockfall": 376,
@@ -16192,7 +16192,7 @@
     },
     {
       "DATE": "2026-05-02",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 32,
       "VolcanicTremors": 25,
       "Rockfall": 284,
@@ -16204,7 +16204,7 @@
     },
     {
       "DATE": "2026-05-03",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 5,
       "VolcanicTremors": 4,
       "Rockfall": 411,
@@ -16216,7 +16216,7 @@
     },
     {
       "DATE": "2026-05-04",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 14,
       "VolcanicTremors": 5,
       "Rockfall": 336,
@@ -16228,7 +16228,7 @@
     },
     {
       "DATE": "2026-05-05",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 11,
       "VolcanicTremors": 3,
       "Rockfall": 283,
@@ -16240,7 +16240,7 @@
     },
     {
       "DATE": "2026-05-06",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 10,
       "VolcanicTremors": 6,
       "Rockfall": 297,
@@ -16252,7 +16252,7 @@
     },
     {
       "DATE": "2026-05-07",
-      "AlertLevel": "",
+      "AlertLevel": 3,
       "VEQ": 30,
       "VolcanicTremors": 15,
       "Rockfall": 290,
@@ -17080,7 +17080,7 @@
     },
     {
       "DATE": "2026-07-15",
-      "AlertLevel": "RE",
+      "AlertLevel": 3,
       "VEQ": 168,
       "VolcanicTremors": 13,
       "Rockfall": 293,
@@ -18361,6 +18361,18 @@
       "PlumeHeight": 100,
       "STALTA": "",
       "eruption": 0
+    },
+    {
+      "DATE": "2026-10-30",
+      "AlertLevel": 3,
+      "VEQ": 15,
+      "VolcanicTremors": 0,
+      "Rockfall": 30,
+      "PDCEvents": 0,
+      "SO2Flux": 988,
+      "PlumeHeight": 3000,
+      "STALTA": "",
+      "eruption": 1
     }
   ]
 }
