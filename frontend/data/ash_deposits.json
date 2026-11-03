@@ -2,6 +2,13 @@
   "models": {
     "Kanlaon": [
       {
+        "id": "kanlaon_20261104T0000Z_run20261103T0639Z",
+        "title": "Kanlaon 4 November 2026 Eruption",
+        "eruptionStart": "2026-11-04T00:00:00Z",
+        "runDate": "2026-11-03T06:39:00Z",
+        "url": "./data/ash/kanlaon_20261104T0000Z_run20261103T0639Z.geojson"
+      },
+      {
         "id": "kanlaon_20240603T1051Z_run20260511T0256Z",
         "title": "Kanlaon 3 June 2024 Eruption",
         "eruptionStart": "2024-06-03T10:51:00Z",
@@ -10,6 +17,13 @@
       }
     ],
     "Mayon": [
+      {
+        "id": "mayon_20261103T0022Z_run20261103T0156Z",
+        "title": "Mayon 3 November 2026 Eruption",
+        "eruptionStart": "2026-11-03T00:22:00Z",
+        "runDate": "2026-11-03T01:56:00Z",
+        "url": "./data/ash/mayon_20261103T0022Z_run20261103T0156Z.geojson"
+      },
       {
         "id": "mayon_20261030T0352Z_run20261031T0259Z",
         "title": "Mayon 30 October 2026 Eruption",
