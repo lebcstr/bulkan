@@ -1,6 +1,6 @@
 {
   "volcano": "mayon",
-  "syncedAt": "2026-11-02T07:31:46.840Z",
+  "syncedAt": "2026-11-03T02:48:25.776Z",
   "records": [
     {
       "DATE": "2022-08-21",
@@ -18373,6 +18373,42 @@
       "PlumeHeight": 3000,
       "STALTA": "",
       "eruption": 1
+    },
+    {
+      "DATE": "2026-10-31",
+      "AlertLevel": 3,
+      "VEQ": 14,
+      "VolcanicTremors": 0,
+      "Rockfall": 7,
+      "PDCEvents": 0,
+      "SO2Flux": 1374,
+      "PlumeHeight": 200,
+      "STALTA": "",
+      "eruption": 0
+    },
+    {
+      "DATE": "2026-11-01",
+      "AlertLevel": 3,
+      "VEQ": 14,
+      "VolcanicTremors": 0,
+      "Rockfall": 1,
+      "PDCEvents": 0,
+      "SO2Flux": 1844,
+      "PlumeHeight": "",
+      "STALTA": "",
+      "eruption": 0
+    },
+    {
+      "DATE": "2026-11-02",
+      "AlertLevel": 3,
+      "VEQ": 13,
+      "VolcanicTremors": 0,
+      "Rockfall": 1,
+      "PDCEvents": 0,
+      "SO2Flux": 1751,
+      "PlumeHeight": 100,
+      "STALTA": "",
+      "eruption": 0
     }
   ]
 }
