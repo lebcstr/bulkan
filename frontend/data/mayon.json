@@ -1,6 +1,6 @@
 {
   "volcano": "mayon",
-  "syncedAt": "2026-11-03T07:45:24.799Z",
+  "syncedAt": "2026-11-04T07:24:09.856Z",
   "records": [
     {
       "DATE": "2022-08-21",
@@ -18407,6 +18407,18 @@
       "PDCEvents": 0,
       "SO2Flux": 1751,
       "PlumeHeight": 100,
+      "STALTA": "",
+      "eruption": 0
+    },
+    {
+      "DATE": "2026-11-03",
+      "AlertLevel": 3,
+      "VEQ": 11,
+      "VolcanicTremors": 0,
+      "Rockfall": 0,
+      "PDCEvents": 0,
+      "SO2Flux": 1894,
+      "PlumeHeight": 1600,
       "STALTA": "",
       "eruption": 0
     }

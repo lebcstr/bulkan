@@ -2,11 +2,137 @@
   "models": {
     "Kanlaon": [
       {
+        "id": "kanlaon_20261104T1200Z_run20261104T0630Z",
+        "title": "Kanlaon 4 November 2026 Eruption",
+        "eruptionStart": "2026-11-04T12:00:00Z",
+        "runDate": "2026-11-04T06:30:00Z",
+        "url": "./data/ash/kanlaon_20261104T1200Z_run20261104T0630Z.geojson"
+      },
+      {
+        "id": "kanlaon_20261104T1200Z_run20261104T0614Z",
+        "title": "Kanlaon 4 November 2026 Eruption",
+        "eruptionStart": "2026-11-04T12:00:00Z",
+        "runDate": "2026-11-04T06:14:00Z",
+        "url": "./data/ash/kanlaon_20261104T1200Z_run20261104T0614Z.geojson"
+      },
+      {
+        "id": "kanlaon_20261104T1200Z_run20261104T0604Z",
+        "title": "Kanlaon 4 November 2026 Eruption",
+        "eruptionStart": "2026-11-04T12:00:00Z",
+        "runDate": "2026-11-04T06:04:00Z",
+        "url": "./data/ash/kanlaon_20261104T1200Z_run20261104T0604Z.geojson"
+      },
+      {
+        "id": "kanlaon_20261104T1200Z_run20261104T0554Z",
+        "title": "Kanlaon 4 November 2026 Eruption",
+        "eruptionStart": "2026-11-04T12:00:00Z",
+        "runDate": "2026-11-04T05:54:00Z",
+        "url": "./data/ash/kanlaon_20261104T1200Z_run20261104T0554Z.geojson"
+      },
+      {
+        "id": "kanlaon_20261104T1200Z_run20261104T0551Z",
+        "title": "Kanlaon 4 November 2026 Eruption",
+        "eruptionStart": "2026-11-04T12:00:00Z",
+        "runDate": "2026-11-04T05:51:00Z",
+        "url": "./data/ash/kanlaon_20261104T1200Z_run20261104T0551Z.geojson"
+      },
+      {
+        "id": "kanlaon_20261104T0000Z_run20261104T0539Z",
+        "title": "Kanlaon 4 November 2026 Eruption",
+        "eruptionStart": "2026-11-04T00:00:00Z",
+        "runDate": "2026-11-04T05:39:00Z",
+        "url": "./data/ash/kanlaon_20261104T0000Z_run20261104T0539Z.geojson"
+      },
+      {
+        "id": "kanlaon_20261104T0000Z_run20261104T0536Z",
+        "title": "Kanlaon 4 November 2026 Eruption",
+        "eruptionStart": "2026-11-04T00:00:00Z",
+        "runDate": "2026-11-04T05:36:00Z",
+        "url": "./data/ash/kanlaon_20261104T0000Z_run20261104T0536Z.geojson"
+      },
+      {
+        "id": "kanlaon_20261104T0000Z_run20261104T0359Z",
+        "title": "Kanlaon 4 November 2026 Eruption",
+        "eruptionStart": "2026-11-04T00:00:00Z",
+        "runDate": "2026-11-04T03:59:00Z",
+        "url": "./data/ash/kanlaon_20261104T0000Z_run20261104T0359Z.geojson"
+      },
+      {
         "id": "kanlaon_20261104T0000Z_run20261103T0639Z",
         "title": "Kanlaon 4 November 2026 Eruption",
         "eruptionStart": "2026-11-04T00:00:00Z",
         "runDate": "2026-11-03T06:39:00Z",
         "url": "./data/ash/kanlaon_20261104T0000Z_run20261103T0639Z.geojson"
+      },
+      {
+        "id": "kanlaon_20261103T1200Z_run20261104T0322Z",
+        "title": "Kanlaon 3 November 2026 Eruption",
+        "eruptionStart": "2026-11-03T12:00:00Z",
+        "runDate": "2026-11-04T03:22:00Z",
+        "url": "./data/ash/kanlaon_20261103T1200Z_run20261104T0322Z.geojson"
+      },
+      {
+        "id": "kanlaon_20261103T1200Z_run20261104T0319Z",
+        "title": "Kanlaon 3 November 2026 Eruption",
+        "eruptionStart": "2026-11-03T12:00:00Z",
+        "runDate": "2026-11-04T03:19:00Z",
+        "url": "./data/ash/kanlaon_20261103T1200Z_run20261104T0319Z.geojson"
+      },
+      {
+        "id": "kanlaon_20261103T1200Z_run20261104T0316Z",
+        "title": "Kanlaon 3 November 2026 Eruption",
+        "eruptionStart": "2026-11-03T12:00:00Z",
+        "runDate": "2026-11-04T03:16:00Z",
+        "url": "./data/ash/kanlaon_20261103T1200Z_run20261104T0316Z.geojson"
+      },
+      {
+        "id": "kanlaon_20261103T1200Z_run20261104T0305Z",
+        "title": "Kanlaon 3 November 2026 Eruption",
+        "eruptionStart": "2026-11-03T12:00:00Z",
+        "runDate": "2026-11-04T03:05:00Z",
+        "url": "./data/ash/kanlaon_20261103T1200Z_run20261104T0305Z.geojson"
+      },
+      {
+        "id": "kanlaon_20261103T1200Z_run20261104T0221Z",
+        "title": "Kanlaon 3 November 2026 Eruption",
+        "eruptionStart": "2026-11-03T12:00:00Z",
+        "runDate": "2026-11-04T02:21:00Z",
+        "url": "./data/ash/kanlaon_20261103T1200Z_run20261104T0221Z.geojson"
+      },
+      {
+        "id": "kanlaon_20261103T0000Z_run20261104T0211Z",
+        "title": "Kanlaon 3 November 2026 Eruption",
+        "eruptionStart": "2026-11-03T00:00:00Z",
+        "runDate": "2026-11-04T02:11:00Z",
+        "url": "./data/ash/kanlaon_20261103T0000Z_run20261104T0211Z.geojson"
+      },
+      {
+        "id": "kanlaon_20261103T0000Z_run20261104T0206Z",
+        "title": "Kanlaon 3 November 2026 Eruption",
+        "eruptionStart": "2026-11-03T00:00:00Z",
+        "runDate": "2026-11-04T02:06:00Z",
+        "url": "./data/ash/kanlaon_20261103T0000Z_run20261104T0206Z.geojson"
+      },
+      {
+        "id": "kanlaon_20261103T0000Z_run20261104T0200Z",
+        "title": "Kanlaon 3 November 2026 Eruption",
+        "eruptionStart": "2026-11-03T00:00:00Z",
+        "runDate": "2026-11-04T02:00:00Z",
+        "url": "./data/ash/kanlaon_20261103T0000Z_run20261104T0200Z.geojson"
+      },
+      {
+        "id": "kanlaon_20261103T0000Z_run20261103T0814Z",
+        "title": "Kanlaon 3 November 2026 Eruption",
+        "eruptionStart": "2026-11-03T00:00:00Z",
+        "runDate": "2026-11-03T08:14:00Z",
+        "url": "./data/ash/kanlaon_20261103T0000Z_run20261103T0814Z.geojson"
+      },
+      {
+        "id": "kanlaon_20261103T0000Z_run20261103T0804Z",
+        "title": "Kanlaon 3 November 2026 Eruption",
+        "eruptionStart": "2026-11-03T00:00:00Z",
+        "runDate": "2026-11-03T08:04:00Z",
+        "url": "./data/ash/kanlaon_20261103T0000Z_run20261103T0804Z.geojson"
       },
       {
         "id": "kanlaon_20240603T1051Z_run20260511T0256Z",
