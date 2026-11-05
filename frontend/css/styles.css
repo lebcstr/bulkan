@@ -181,9 +181,9 @@ body{
 .ash-cal-day.selected{background:var(--accent);border-color:var(--accent);color:#fff}
 .ash-scenario-bar{display:flex;flex-wrap:wrap;gap:0.75rem 1.5rem;padding:0.75rem 1.5rem;border-bottom:1px solid var(--border)}
 .ash-toggle-group{display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap}
-.ash-toggle-label{font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px}
+.ash-toggle-label{font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px}
 .ash-toggle{display:inline-flex;flex-wrap:wrap;border:1px solid var(--border);border-radius:4px;overflow:hidden}
-.ash-toggle button{background:var(--bg);color:var(--text2);border:none;border-left:1px solid var(--border);padding:0.35rem 0.7rem;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;cursor:pointer}
+.ash-toggle button{background:var(--bg);color:var(--text2);border:none;border-left:1px solid var(--border);padding:0.4rem 0.8rem;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;cursor:pointer}
 .ash-toggle button:first-child{border-left:none}
 .ash-toggle button:hover:not(:disabled){background:var(--surface2);color:var(--text)}
 .ash-toggle button.active{background:var(--accent);color:#fff}
