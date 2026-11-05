@@ -165,7 +165,7 @@ body{
 #ash-deposit-map{height:620px;border-radius:6px;border:1px solid var(--border)}
 #ash-deposit-body.hidden,.ash-deposit-empty.hidden,.ash-calendar.hidden,.ash-calendar-pop.hidden,.ash-scenario-bar.hidden,.ash-toggle-group.hidden{display:none}
 .ash-calendar{position:relative}
-.ash-calendar-trigger{background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:0.3rem 0.6rem;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;cursor:pointer}
+.ash-calendar-trigger{background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:0.4rem 0.75rem;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;cursor:pointer}
 .ash-calendar-trigger:hover,.ash-calendar-trigger[aria-expanded="true"]{border-color:var(--accent)}
 .ash-calendar-pop{position:absolute;right:0;top:calc(100% + 6px);z-index:1100;width:236px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:0.6rem;box-shadow:0 8px 24px rgba(0,0,0,0.45);text-transform:none;letter-spacing:0}
 .ash-cal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;font-size:11px;color:var(--text)}
@@ -189,6 +189,7 @@ body{
 .ash-toggle button.active{background:var(--accent);color:#fff}
 .ash-toggle button:disabled{color:var(--text3);cursor:not-allowed;text-decoration:line-through}
 .ash-deposit-header{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap}
+#ash-deposit-title{font-size:14px}
 .ash-deposit-empty{text-align:center;padding:2.5rem 1.25rem;color:var(--text2);font-size:11px}
 .ash-school-box{display:flex;flex-direction:column;height:620px;border:2px solid rgba(255,107,53,0.6);border-radius:10px;padding:0.8rem;background:linear-gradient(135deg,rgba(255,107,53,0.1) 0%,rgba(255,107,53,0.05) 100%)}
 .ash-school-head{flex-shrink:0;border-bottom:2px solid rgba(255,107,53,0.4);padding-bottom:0.4rem;margin-bottom:0.6rem}
@@ -255,7 +256,7 @@ button.ash-band-chip:disabled{opacity:0.45;cursor:default}
   background:var(--surface2);
   padding:0.85rem 1.25rem;
   border-bottom:1px solid var(--border);
-  font-size:11px;
+  font-size:14px;
   font-weight:700;
   text-transform:uppercase;
   letter-spacing:1px;
