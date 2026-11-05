@@ -61,8 +61,6 @@ function renderParams() {
   }
 
   const latest = data[data.length - 1];
-  const date = (latest.DATE || 'N/A').toString().substring(0, 10);
-  document.getElementById('param-latest-update').textContent = `Latest: ${date}`;
 
   const params = [
     { key: 'VEQ', label: 'VEQ', unit: 'events/day' },
@@ -90,8 +88,8 @@ function renderParams() {
       html += `
         <div class="param-item">
           <div>
-            <div style="font-size:10px;color:var(--text2);text-transform:uppercase">${p.label}</div>
-            <div style="font-size:9px;color:var(--text3);margin-top:0.2rem">${p.unit}</div>
+            <div style="font-size:14px;color:var(--text2);text-transform:uppercase">${p.label}</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:0.2rem">${p.unit}</div>
           </div>
           <div class="param-value">${display}</div>
         </div>`;
