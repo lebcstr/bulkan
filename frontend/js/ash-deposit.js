@@ -115,14 +115,18 @@ function bandLabel(value, values) {
 function makeLegend(values) {
   const legend = L.control({ position: 'bottomright' });
   legend.onAdd = () => {
+    // Starts minimized on phones; tapping the title toggles it.
     const div = L.DomUtil.create('div', 'ash-legend');
-    div.innerHTML = '<div class="legend-title">Deposit thickness</div>' +
+    div.classList.toggle('collapsed', window.matchMedia('(max-width:600px)').matches);
+    L.DomEvent.disableClickPropagation(div);
+    div.innerHTML = '<div class="legend-title ash-legend-toggle">Deposit thickness</div>' +
       values.map(v => `
         <div class="legend-item">
           <span class="ash-legend-swatch" style="background:${colorFor(v)}"></span>
           <span>${v} mm</span>
         </div>`).join('') +
       '<div class="legend-item" style="margin-top:0.4rem"><span class="ash-legend-dot"></span><span>📚 School</span></div>';
+    div.querySelector('.ash-legend-toggle').addEventListener('click', () => div.classList.toggle('collapsed'));
     return div;
   };
   return legend;
@@ -220,7 +224,8 @@ function renderSchoolBox(schools, values, markers) {
 
 function setHeader(text) {
   const el = document.getElementById('ash-deposit-title');
-  if (el) el.textContent = `Ashfall Dispersal Simulation · ${text.toUpperCase()}`;
+  const title = text.replace(/\s+Eruption$/i, '');
+  if (el) el.textContent = `Ashfall Dispersal Simulation · ${title.toUpperCase()}`;
 }
 
 function showEmpty(vol, message) {
@@ -349,7 +354,7 @@ function renderCalendar(vol, groups, group) {
   const trigger = document.getElementById('ash-calendar-trigger');
   wrap.classList.remove('hidden');
   calendar = { vol, groups, group, month: group.date.slice(0, 7) };
-  trigger.textContent = `📅 ${formatDay(group.date)} ▾`;
+  trigger.textContent = `${formatDay(group.date)} ▾`;
   trigger.title = 'Pick a simulation date';
   closeCalendar();
 
@@ -453,7 +458,7 @@ export function initAshDepositMap() {
   if (!container) return;
   // One shared canvas for bands, contours and schools: draw order is click
   // order, so schools (added after the deposit) sit on top and take the click.
-  ashMap = L.map(container, { scrollWheelZoom: false, renderer: L.canvas({ padding: 0.5 }) });
+  ashMap = L.map(container, { renderer: L.canvas({ padding: 0.5 }) });
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '© OpenStreetMap · Ash3d © USGS',
