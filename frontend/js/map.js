@@ -151,14 +151,14 @@ function showRiskZoneInfoBox(radius, locationData) {
       const color = STATUS_COLORS[s.status] || '#8892a8';
       const distance = s.distance ? ` • ${s.distance.toFixed(1)} km` : '';
       return `
-        <div style="padding:0.4rem;background:var(--bg);border-left:3px solid ${color};border-radius:4px;margin-bottom:0.35rem;font-size:8px;">
-          <div style="color:var(--text);margin-bottom:0.15rem;">📚 ${s.name}</div>
-          <div style="color:${color};font-weight:600;font-size:7px;">${s.status}${distance}</div>
+        <div style="padding:0.35rem 0.45rem;background:var(--bg);border-left:3px solid ${color};border-radius:4px;margin-bottom:0.3rem;font-size:11px;">
+          <div style="color:var(--text);margin-bottom:0.1rem;">📚 ${s.name}</div>
+          <div style="color:${color};font-weight:600;font-size:10px;">${s.status}${distance}</div>
         </div>`;
     }).join('');
     return `
       <div style="margin-bottom:0.5rem;padding-bottom:0.5rem;border-bottom:1px solid rgba(255,107,53,0.2);">
-        <div style="font-size:7px;font-weight:700;color:#ff8c2a;text-transform:uppercase;margin-bottom:0.3rem;">📚 ${title}</div>
+        <div style="font-size:9px;font-weight:700;color:#ff8c2a;text-transform:uppercase;margin:0.5rem 0 0.3rem;">📚 ${title}</div>
         ${items}
       </div>`;
   };
@@ -168,45 +168,45 @@ function showRiskZoneInfoBox(radius, locationData) {
     + buildList(depEd.highSchool, 'High Schools');
 
   const centerListHTML = centers.map(c => `
-    <div style="padding:0.4rem;background:var(--bg);border-left:3px solid #44cc66;border-radius:4px;margin-bottom:0.35rem;font-size:8px;">
-      <div style="color:var(--text);margin-bottom:0.15rem;">🏛️ ${c.name}</div>
-      <div style="color:#44cc66;font-weight:600;font-size:7px;">${c.capacity.toLocaleString()} ppl</div>
+    <div style="padding:0.35rem 0.45rem;background:var(--bg);border-left:3px solid #44cc66;border-radius:4px;margin-bottom:0.3rem;font-size:11px;">
+      <div style="color:var(--text);margin-bottom:0.1rem;">🏛️ ${c.name}</div>
+      <div style="color:#44cc66;font-weight:600;font-size:10px;">${c.capacity.toLocaleString()} ppl</div>
     </div>`).join('');
 
   schoolContainer.innerHTML = `
     <div style="border:2px solid rgba(255,107,53,0.6);border-radius:10px;padding:0.8rem;background:linear-gradient(135deg,rgba(255,107,53,0.1) 0%,rgba(255,107,53,0.05) 100%);display:flex;flex-direction:column;height:100%;">
       <div style="margin-bottom:0.6rem;border-bottom:2px solid rgba(255,107,53,0.4);padding-bottom:0.4rem;flex-shrink:0;">
-        <div style="font-size:9px;font-weight:700;color:#ff8c2a;text-transform:uppercase;letter-spacing:0.2px;margin-bottom:0.15rem;">📚 School Risk Assessment</div>
-        <div style="font-size:7px;font-weight:600;color:#ff6b35;text-transform:uppercase;letter-spacing:0.2px;">${radius} KM • ${allSchools.length} Schools</div>
+        <div style="font-size:14px;font-weight:700;color:#ff8c2a;text-transform:uppercase;letter-spacing:0.3px;margin-bottom:0.15rem;">📚 School Risk Assessment</div>
+        <div style="font-size:9px;font-weight:600;color:#ff6b35;text-transform:uppercase;letter-spacing:0.2px;">${radius} KM • ${allSchools.length} Schools</div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.3rem;margin-bottom:0.5rem;flex-shrink:0;">
-        <div style="background:rgba(255,68,68,0.25);border:1px solid rgba(255,68,68,0.5);border-radius:4px;padding:0.3rem;text-align:center;">
-          <div style="color:#ff4444;font-weight:900;font-size:10px;">${criticalCount}</div>
-          <div style="color:#ff4444;font-size:6px;margin-top:0.05rem;text-transform:uppercase;letter-spacing:0.1px;font-weight:700;">Critical</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.3rem;margin-bottom:0.6rem;flex-shrink:0;">
+        <div style="background:rgba(255,68,68,0.25);border:1px solid rgba(255,68,68,0.5);border-radius:4px;padding:0.35rem;text-align:center;">
+          <div style="color:#ff4444;font-weight:900;font-size:16px;">${criticalCount}</div>
+          <div style="color:#ff4444;font-size:10px;margin-top:0.05rem;text-transform:uppercase;letter-spacing:0.2px;font-weight:700;">Critical</div>
         </div>
-        <div style="background:rgba(255,140,42,0.25);border:1px solid rgba(255,140,42,0.5);border-radius:4px;padding:0.3rem;text-align:center;">
-          <div style="color:#ff8c2a;font-weight:900;font-size:10px;">${priorityCount}</div>
-          <div style="color:#ff8c2a;font-size:6px;margin-top:0.05rem;text-transform:uppercase;letter-spacing:0.1px;font-weight:700;">Priority</div>
+        <div style="background:rgba(255,140,42,0.25);border:1px solid rgba(255,140,42,0.5);border-radius:4px;padding:0.35rem;text-align:center;">
+          <div style="color:#ff8c2a;font-weight:900;font-size:16px;">${priorityCount}</div>
+          <div style="color:#ff8c2a;font-size:10px;margin-top:0.05rem;text-transform:uppercase;letter-spacing:0.2px;font-weight:700;">Priority</div>
         </div>
       </div>
-      <div style="overflow-y:auto;flex:1;min-height:0;padding-right:0.3rem;border-top:1px solid rgba(255,107,53,0.3);padding-top:0.4rem;font-size:7px;">
-        ${schoolListHTML || '<div style="color:var(--text2);font-size:7px;text-align:center;">No schools</div>'}
+      <div style="overflow-y:auto;flex:1;min-height:0;padding-right:0.3rem;border-top:1px solid rgba(255,107,53,0.3);padding-top:0.4rem;font-size:11px;">
+        ${schoolListHTML || '<div style="color:var(--text2);font-size:11px;text-align:center;">No schools</div>'}
       </div>
     </div>`;
 
   evacContainer.innerHTML = `
     <div style="border:2px solid rgba(68,204,102,0.6);border-radius:10px;padding:0.8rem;background:linear-gradient(135deg,rgba(68,204,102,0.1) 0%,rgba(68,204,102,0.05) 100%);display:flex;flex-direction:column;height:100%;">
       <div style="margin-bottom:0.6rem;border-bottom:2px solid rgba(68,204,102,0.4);padding-bottom:0.4rem;flex-shrink:0;">
-        <div style="font-size:9px;font-weight:700;color:#3aaa55;text-transform:uppercase;letter-spacing:0.2px;margin-bottom:0.15rem;">🏛️ Evacuation Risk Assessment</div>
-        <div style="font-size:7px;font-weight:600;color:#44cc66;text-transform:uppercase;letter-spacing:0.2px;">${radius} KM • ${centers.length} Centers</div>
+        <div style="font-size:14px;font-weight:700;color:#3aaa55;text-transform:uppercase;letter-spacing:0.3px;margin-bottom:0.15rem;">🏛️ Evacuation Risk Assessment</div>
+        <div style="font-size:9px;font-weight:600;color:#44cc66;text-transform:uppercase;letter-spacing:0.2px;">${radius} KM • ${centers.length} Centers</div>
       </div>
-      <div style="background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:0.4rem;margin-bottom:0.5rem;text-align:center;flex-shrink:0;">
-        <div style="font-size:6px;color:var(--text2);margin-bottom:0.1rem;text-transform:uppercase;letter-spacing:0.1px;font-weight:700;">Capacity</div>
-        <div style="font-size:12px;font-weight:900;color:#44cc66;line-height:1;">${totalCapacity.toLocaleString()}</div>
-        <div style="font-size:6px;color:var(--text2);margin-top:0.05rem;">ppl</div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:0.4rem;margin-bottom:0.6rem;text-align:center;flex-shrink:0;">
+        <div style="font-size:10px;color:var(--text2);margin-bottom:0.15rem;text-transform:uppercase;letter-spacing:0.2px;font-weight:700;">Capacity</div>
+        <div style="font-size:18px;font-weight:900;color:#44cc66;line-height:1;">${totalCapacity.toLocaleString()}</div>
+        <div style="font-size:10px;color:var(--text2);margin-top:0.1rem;">ppl</div>
       </div>
-      <div style="overflow-y:auto;flex:1;min-height:0;padding-right:0.3rem;border-top:1px solid rgba(68,204,102,0.3);padding-top:0.4rem;font-size:7px;">
-        ${centerListHTML || '<div style="color:var(--text2);font-size:7px;text-align:center;">No centers</div>'}
+      <div style="overflow-y:auto;flex:1;min-height:0;padding-right:0.3rem;border-top:1px solid rgba(68,204,102,0.3);padding-top:0.4rem;font-size:11px;">
+        ${centerListHTML || '<div style="color:var(--text2);font-size:11px;text-align:center;">No centers</div>'}
       </div>
     </div>`;
 }

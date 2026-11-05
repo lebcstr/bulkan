@@ -224,7 +224,8 @@ function renderSchoolBox(schools, values, markers) {
 
 function setHeader(text) {
   const el = document.getElementById('ash-deposit-title');
-  if (el) el.textContent = `Ashfall Dispersal Simulation · ${text.toUpperCase()}`;
+  const title = text.replace(/\s+Eruption$/i, '');
+  if (el) el.textContent = `Ashfall Dispersal Simulation · ${title.toUpperCase()}`;
 }
 
 function showEmpty(vol, message) {
@@ -353,7 +354,7 @@ function renderCalendar(vol, groups, group) {
   const trigger = document.getElementById('ash-calendar-trigger');
   wrap.classList.remove('hidden');
   calendar = { vol, groups, group, month: group.date.slice(0, 7) };
-  trigger.textContent = `📅 ${formatDay(group.date)} ▾`;
+  trigger.textContent = `${formatDay(group.date)} ▾`;
   trigger.title = 'Pick a simulation date';
   closeCalendar();
 
@@ -457,7 +458,7 @@ export function initAshDepositMap() {
   if (!container) return;
   // One shared canvas for bands, contours and schools: draw order is click
   // order, so schools (added after the deposit) sit on top and take the click.
-  ashMap = L.map(container, { scrollWheelZoom: false, renderer: L.canvas({ padding: 0.5 }) });
+  ashMap = L.map(container, { renderer: L.canvas({ padding: 0.5 }) });
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '© OpenStreetMap · Ash3d © USGS',
