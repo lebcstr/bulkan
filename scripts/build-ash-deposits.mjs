@@ -257,6 +257,34 @@ function normalizeRows(rows, origin, fileTime) {
   return null;
 }
 
+// Scheduled runs are named "<Volcano>-<MM>-<DD>-<YY>-<time>-<plume>KM"
+// (e.g. "Kanlaon-11-03-26-8AM-5KM") on the zip, subfolder or shapefile. Older
+// uploads don't follow it and stay standalone runs.
+const SCENARIO_NAME = /([A-Za-z]+)-(\d{1,2})-(\d{1,2})-(\d{2}|\d{4})-(\d{1,2})\s*([AP]M)-(\d+(?:\.\d+)?)\s*KM/gi;
+
+function parseScenario(volcano, origin) {
+  const match = [...origin.matchAll(SCENARIO_NAME)].at(-1);
+  if (!match) return null;
+  const [, name, month, day, year, hour, ampm, plume] = match;
+  if (name.toLowerCase() !== volcano.toLowerCase()) {
+    console.warn(`[scenario] ${origin}: named for "${name}" but is in the ${volcano} folder; treating as a standalone run`);
+    return null;
+  }
+  const date = `${year.length === 2 ? `20${year}` : year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  if (Number.isNaN(Date.parse(date))) {
+    console.warn(`[scenario] ${origin}: "${match[0]}" has an invalid date; treating as a standalone run`);
+    return null;
+  }
+  const set = `${volcano.toLowerCase()}_${date.replace(/-/g, '')}`;
+  return {
+    set,
+    setTitle: `${volcano} ${formatDate(`${date}T12:00:00+08:00`)} Simulations`,
+    date,
+    time: `${Number(hour)}${ampm.toUpperCase()}`,
+    plumeKm: Number(plume),
+  };
+}
+
 function convert(volcano, { origin, shp, dbf, fileTime }) {
   const rows = normalizeRows(readDbf(dbf), origin, fileTime);
   if (!rows) return null;
@@ -270,15 +298,21 @@ function convert(volcano, { origin, shp, dbf, fileTime }) {
 
   const eruptionStart = first.E_STIME || null;
   const runDate = first['RUN DATE'];
-  const id = `${volcano.toLowerCase()}_${eruptionStart ? `${compactTime(eruptionStart)}_` : ''}run${compactTime(runDate)}`;
+  const scenario = parseScenario(volcano, origin);
+  const id = scenario
+    ? `${scenario.set}_${scenario.time.toLowerCase()}_${scenario.plumeKm}km`
+    : `${volcano.toLowerCase()}_${eruptionStart ? `${compactTime(eruptionStart)}_` : ''}run${compactTime(runDate)}`;
   return {
     entry: {
       id,
-      title: eruptionStart
-        ? `${volcano} ${formatDate(eruptionStart)} Eruption`
-        : `${volcano} Ash3d Model · ${formatDate(runDate)}`,
+      title: scenario
+        ? `${volcano} ${formatDate(`${scenario.date}T12:00:00+08:00`)} · ${scenario.time} · ${scenario.plumeKm} km plume`
+        : eruptionStart
+          ? `${volcano} ${formatDate(eruptionStart)} Eruption`
+          : `${volcano} Ash3d Model · ${formatDate(runDate)}`,
       eruptionStart,
       runDate,
+      ...(scenario && { scenario }),
       url: `./data/ash/${id}.geojson`,
     },
     geojson: {
@@ -313,9 +347,17 @@ async function main() {
       outputs.push(result);
       console.log(`[${volcano}] ${result.entry.title} (${result.geojson.features.length} isopachs) ← ${shapefile.origin}`);
     }
-    // Newest eruption first (run date when the eruption time is unknown), then newest run.
-    const when = m => m.eruptionStart || m.runDate;
-    list.sort((a, b) => when(b).localeCompare(when(a)) || b.runDate.localeCompare(a.runDate));
+    // Newest first: scenario date, else eruption time, else run date. A
+    // scenario set's runs stay together so the dashboard can group them.
+    const when = m => m.scenario?.date || m.eruptionStart || m.runDate;
+    list.sort((a, b) => when(b).localeCompare(when(a))
+      || (a.scenario?.set || a.id).localeCompare(b.scenario?.set || b.id)
+      || b.runDate.localeCompare(a.runDate));
+    const setSizes = {};
+    for (const m of list) if (m.scenario) setSizes[m.scenario.set] = (setSizes[m.scenario.set] || 0) + 1;
+    for (const [set, n] of Object.entries(setSizes)) {
+      if (n < 10) console.warn(`[scenario] ${set}: ${n} of 10 scenarios found`);
+    }
   }
 
   await rm(OUT_DIR, { recursive: true, force: true });

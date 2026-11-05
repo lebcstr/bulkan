@@ -156,35 +156,58 @@ body{
 }
 .ash-deposit-body{
   display:grid;
-  grid-template-columns:1fr 280px;
+  grid-template-columns:1fr;
   gap:1.5rem;
   align-items:start;
 }
 #ash-deposit-map{height:620px;border-radius:6px;border:1px solid var(--border)}
-#ash-deposit-body.hidden,.ash-deposit-empty.hidden,.ash-run-select.hidden{display:none}
+#ash-deposit-body.hidden,.ash-deposit-empty.hidden,.ash-calendar.hidden,.ash-calendar-pop.hidden,.ash-scenario-bar.hidden,.ash-toggle-group.hidden{display:none}
+.ash-calendar{position:relative}
+.ash-calendar-trigger{background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:0.3rem 0.6rem;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;cursor:pointer}
+.ash-calendar-trigger:hover,.ash-calendar-trigger[aria-expanded="true"]{border-color:var(--accent)}
+.ash-calendar-pop{position:absolute;right:0;top:calc(100% + 6px);z-index:1100;width:236px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:0.6rem;box-shadow:0 8px 24px rgba(0,0,0,0.45);text-transform:none;letter-spacing:0}
+.ash-cal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;font-size:11px;color:var(--text)}
+.ash-cal-nav{background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--text);width:24px;height:24px;cursor:pointer;font-size:12px;line-height:1}
+.ash-cal-nav:hover:not(:disabled){border-color:var(--accent)}
+.ash-cal-nav:disabled{color:var(--text3);cursor:not-allowed}
+.ash-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center}
+.ash-cal-weekday{font-size:8px;color:var(--text2);padding-bottom:0.2rem}
+.ash-cal-day{font-family:'JetBrains Mono',monospace;font-size:10px;padding:0.3rem 0;border-radius:4px;border:1px solid transparent}
+.ash-cal-day.unavailable{color:var(--text3);text-decoration:line-through}
+.ash-cal-day.available{background:var(--bg);border-color:var(--border);color:var(--text);font-weight:700;cursor:pointer}
+.ash-cal-day.available:hover{border-color:var(--accent)}
+.ash-cal-day.selected{background:var(--accent);border-color:var(--accent);color:#fff}
+.ash-scenario-bar{display:flex;flex-wrap:wrap;gap:0.75rem 1.5rem;padding:0.75rem 1.5rem;border-bottom:1px solid var(--border)}
+.ash-toggle-group{display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap}
+.ash-toggle-label{font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px}
+.ash-toggle{display:inline-flex;flex-wrap:wrap;border:1px solid var(--border);border-radius:4px;overflow:hidden}
+.ash-toggle button{background:var(--bg);color:var(--text2);border:none;border-left:1px solid var(--border);padding:0.35rem 0.7rem;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;cursor:pointer}
+.ash-toggle button:first-child{border-left:none}
+.ash-toggle button:hover:not(:disabled){background:var(--surface2);color:var(--text)}
+.ash-toggle button.active{background:var(--accent);color:#fff}
+.ash-toggle button:disabled{color:var(--text3);cursor:not-allowed;text-decoration:line-through}
 .ash-deposit-header{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap}
-.ash-run-select{background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:0.3rem 0.5rem;font-family:'JetBrains Mono',monospace;font-size:10px;max-width:100%}
 .ash-deposit-empty{text-align:center;padding:2.5rem 1.25rem;color:var(--text2);font-size:11px}
 .ash-school-box{display:flex;flex-direction:column;height:620px;border:2px solid rgba(255,107,53,0.6);border-radius:10px;padding:0.8rem;background:linear-gradient(135deg,rgba(255,107,53,0.1) 0%,rgba(255,107,53,0.05) 100%)}
 .ash-school-head{flex-shrink:0;border-bottom:2px solid rgba(255,107,53,0.4);padding-bottom:0.4rem;margin-bottom:0.6rem}
-.ash-school-title{font-size:10px;font-weight:700;color:#ff8c2a;text-transform:uppercase;letter-spacing:0.3px}
+.ash-school-title{font-size:14px;font-weight:700;color:#ff8c2a;text-transform:uppercase;letter-spacing:0.3px}
 .ash-school-sub{font-size:9px;font-weight:600;color:var(--accent);text-transform:uppercase;margin-top:0.15rem}
-.ash-band-chips{flex-shrink:0;display:grid;grid-template-columns:repeat(2,1fr);gap:0.3rem;margin-bottom:0.6rem}
-.ash-band-chip{background:var(--bg);border:1px solid var(--border);border-left:3px solid;border-radius:4px;padding:0.3rem 0.45rem;display:flex;justify-content:space-between;align-items:baseline;font-size:9px;color:var(--text2)}
-.ash-band-chip strong{font-size:11px;color:var(--text)}
-.ash-school-list{flex:1;min-height:0;overflow-y:auto;padding-right:0.3rem;border-top:1px solid rgba(255,107,53,0.3);padding-top:0.4rem}
+.ash-band-chips{flex-shrink:0;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:0.3rem;margin-bottom:0.6rem}
+.ash-band-chip{background:var(--bg);border:1px solid var(--border);border-left:3px solid;border-radius:4px;padding:0.3rem 0.45rem;display:flex;justify-content:space-between;align-items:baseline;font-size:11px;color:var(--text2)}
+.ash-band-chip strong{font-size:13px;color:var(--text)}
+button.ash-band-chip{font-family:'JetBrains Mono',monospace;text-align:left;cursor:pointer}
+button.ash-band-chip:hover:not(:disabled){background:var(--surface2)}
+button.ash-band-chip.active{background:var(--surface2);border-color:var(--accent);color:var(--text)}
+button.ash-band-chip:disabled{opacity:0.45;cursor:default}
+.ash-school-list{flex:1;min-height:0;overflow-y:auto;padding-right:0.3rem;border-top:1px solid rgba(255,107,53,0.3);padding-top:0.4rem;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));column-gap:0.3rem;align-content:start}
+.ash-band-title,.ash-show-more,.ash-school-list>.ash-school-meta{grid-column:1/-1}
 .ash-band-title{font-size:9px;font-weight:700;text-transform:uppercase;margin:0.5rem 0 0.3rem}
-.ash-school-item{padding:0.35rem 0.45rem;background:var(--bg);border-left:3px solid;border-radius:4px;margin-bottom:0.3rem;font-size:9px;color:var(--text);cursor:pointer}
+.ash-school-item{padding:0.35rem 0.45rem;background:var(--bg);border-left:3px solid;border-radius:4px;margin-bottom:0.3rem;font-size:11px;color:var(--text);cursor:pointer}
+.ash-school-item .ash-school-meta{font-size:10px}
 .ash-school-item:hover{background:var(--surface2)}
 .ash-show-more{width:100%;margin:0.1rem 0 0.4rem;padding:0.35rem;background:transparent;border:1px dashed var(--border);border-radius:4px;color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:9px;cursor:pointer}
 .ash-show-more:hover{background:var(--surface2)}
 .ash-school-meta{font-size:8px;color:var(--text2);margin-top:0.1rem}
-.ash-deposit-info{border-top:2px solid var(--border);padding:1rem 1.5rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem}
-.ash-info-row{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:0.75rem;text-align:center}
-.ash-info-label{font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.3rem}
-.ash-info-value{font-size:12px;font-weight:700;color:var(--accent)}
-.ash-info-note{grid-column:1/-1;font-size:10px;color:var(--text2)}
-.ash-info-link{grid-column:1/-1;font-size:10px;color:var(--accent);text-decoration:none;text-align:right}
 .ash-legend{background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:0.75rem 1rem;font-size:10px;font-family:'JetBrains Mono',monospace;box-shadow:0 4px 12px rgba(0,0,0,0.3)}
 .ash-legend .legend-item{margin-bottom:0.3rem}
 .ash-legend-swatch{width:18px;height:4px;border-radius:2px;display:inline-block}
@@ -193,6 +216,12 @@ body{
   .ash-deposit-body{grid-template-columns:1fr}
   #ash-deposit-map{height:400px}
   .ash-school-box{height:420px}
+  .ash-school-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .ash-band-chips{grid-auto-flow:row;grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:480px){
+  .ash-school-list{grid-template-columns:minmax(0,1fr)}
+  .ash-band-chips{grid-template-columns:minmax(0,1fr)}
 }
 .main-container{
   display:grid;
@@ -219,6 +248,16 @@ body{
   letter-spacing:1px;
 }
 .panel-body{padding:1.25rem}
+.panel-header-row{display:flex;justify-content:space-between;align-items:center;gap:1rem}
+.panel-actions{display:flex;align-items:center;gap:0.5rem}
+.panel-toggle{background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--text2);width:24px;height:24px;font-family:'JetBrains Mono',monospace;font-size:14px;line-height:1;cursor:pointer;flex-shrink:0}
+.panel-toggle:hover{border-color:var(--accent);color:var(--text)}
+/* Minimized: clip the content instead of display:none, so Leaflet maps keep
+   their size and don't need re-laying out when restored. */
+/* !important: some panel sections (e.g. Zone Statistics) set padding/border inline. */
+.panel.collapsed>:not(.panel-header){height:0;padding:0!important;margin:0!important;border:0!important;overflow:hidden;visibility:hidden}
+.panel.collapsed>.panel-header{border-bottom:0}
+.panel.collapsed .ash-calendar{display:none}
 .param-item{
   display:flex;
   justify-content:space-between;

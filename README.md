@@ -91,10 +91,11 @@ Upload the Ash3d deposit shapefile to the volcano's Google Drive folder, as the 
 
 The daily **Sync Sheets Data** workflow (09:00 PH time) picks it up and redeploys. To publish immediately, run that workflow from the Actions tab.
 
-- Volcano, eruption time and run date are read from the shapefile itself; file names don't matter.
+- **Scheduled simulations:** name each run's `.zip`, subfolder or shapefile `<Volcano>-<MM>-<DD>-<YY>-<time>-<plume>KM`, e.g. `Kanlaon-11-03-26-8AM-5KM`. One date's runs (8AM and 8PM × 2, 3, 4, 5, 6 km) appear as one day in the panel's calendar, with **Time** and **Plume height** toggles above the map. A set that's missing some scenarios still shows; missing ones are greyed out, and the workflow log warns `N of 10 scenarios found`. The chosen time and plume height stay selected when you switch date or volcano.
+- Files that don't follow that naming are listed on their own as before: volcano, eruption time and run date are read from the shapefile itself.
 - Older Ash3d exports (`dp_mm.*`, columns `name`/`value`/`index` only) also work. They carry no eruption parameters, so the run date comes from the file timestamp and the model is titled "<Volcano> Ash3d Model · <date>".
 - A model whose volcano doesn't match its folder is skipped (see the workflow log).
-- The newest eruption is shown by default; older runs appear in the panel's dropdown.
+- The newest date is shown by default. Pick another from the 📅 calendar in the panel header; days without a simulation are struck through. A day with several runs that don't follow the naming gets a **Run** toggle.
 - Deleting a file from Drive removes that model on the next run. If Drive can't be read, the last published models stay up.
 
 The folders are private and read with the service account (see [Google access](#google-access)).
@@ -113,26 +114,7 @@ node build-ash-deposits.mjs --local <dir>
 
 Volcano records come from the automated monitoring Google Sheets, read with the Sheets API v4 as the service account. The sheets stay private; they only need to be shared (Viewer) with the service account.
 
-| Volcano | Sheet ID | Tab |
-|---|---|---|
-| Kanlaon | `1OHHgo043us1oTq_5gg8r8aKo2h3EbQQVjHnoVpV4WYM` | `Sheet1` |
-| Mayon   | `19_dxIPl5COPnlACF0at0ZqdFss5sGH3HWBaDFn2_2Cs` | `Sheet1` |
-| Taal    | `170KpOGupG9ijfSqptHpFW2DpEr-h0iIigiMq6neeuYQ` | `SinceJan13` |
-
 Columns are mapped **by position**, so inserting or reordering a column in a sheet shifts the data. Row 1 is the header and is skipped.
-
-| Field | Kanlaon | Mayon | Taal |
-|---|---|---|---|
-| AlertLevel | B | A | A |
-| DATE | C | B | B |
-| VEQ | D | C | F |
-| VolcanicTremors | – | D | G |
-| Rockfall | – | E | – |
-| PDCEvents | – | F | F |
-| SO2Flux | H | H | C |
-| PlumeHeight | I | I | J |
-| STALTA | N | – | – |
-| Eruption | K | K | L |
 
 - Dates may be real date cells or text; date cells are written as `YYYY-MM-DD`.
 - A day is flagged `eruption: 1` when its Eruption cell contains the word "eruption".
