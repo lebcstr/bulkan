@@ -237,6 +237,7 @@ button.ash-band-chip:disabled{opacity:0.45;cursor:default}
 .trends-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem}
 .trends-controls{display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap}
 .trends-range{display:flex;gap:0.5rem;flex-wrap:wrap}
+.trends-nav{display:flex;gap:0.25rem}
 .main-container{
   display:grid;
   grid-template-columns:350px 1fr;
@@ -743,6 +744,32 @@ button.ash-band-chip:disabled{opacity:0.45;cursor:default}
   #map{height:350px}
   #ash-deposit-map{height:350px}
   .risk-box{height:380px}
+
+  /* Trends header: title + prev/next arrows on top, range tabs below */
+  .trends-header{display:grid;grid-template-columns:1fr auto;align-items:center}
+  .trends-controls{display:contents}
+  .trends-nav{grid-row:1;grid-column:2}
+  .trends-range{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,1fr)}
+
+  /* Ash calendar: anchor to the panel header so it stays on screen */
+  .ash-deposit-header{position:relative}
+  .ash-calendar{position:static}
+  .ash-calendar-pop{left:0.75rem;right:0.75rem;width:auto;max-width:320px;margin:0 auto}
+  .ash-cal-day{padding:0.45rem 0}
+  .ash-cal-nav{width:32px;height:32px}
+
+  /* Ash legend: minimized by default, tap the title to expand */
+  .ash-legend-toggle{cursor:pointer;margin-bottom:0}
+  .ash-legend-toggle::after{content:' ▾'}
+  .ash-legend.collapsed .ash-legend-toggle::after{content:' ▸'}
+  .ash-legend:not(.collapsed) .ash-legend-toggle{margin-bottom:0.5rem}
+  .ash-legend.collapsed .legend-item{display:none}
+  .ash-legend{padding:0.5rem 0.75rem}
+
+  /* Ash school box: compact range grid, taller list */
+  .ash-school-box{height:600px}
+  .ash-band-chips{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .ash-band-chip{flex-direction:column;align-items:flex-start;gap:0.1rem;font-size:10px}
 
   .chatbot-toggle{right:1rem;bottom:1rem;width:56px;height:56px;font-size:28px}
   .chatbot-window{right:1rem;left:1rem;width:auto;bottom:5rem;height:min(520px, calc(100vh - 7rem));max-height:calc(100vh - 7rem)}

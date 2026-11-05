@@ -115,14 +115,18 @@ function bandLabel(value, values) {
 function makeLegend(values) {
   const legend = L.control({ position: 'bottomright' });
   legend.onAdd = () => {
+    // Starts minimized on phones; tapping the title toggles it.
     const div = L.DomUtil.create('div', 'ash-legend');
-    div.innerHTML = '<div class="legend-title">Deposit thickness</div>' +
+    div.classList.toggle('collapsed', window.matchMedia('(max-width:600px)').matches);
+    L.DomEvent.disableClickPropagation(div);
+    div.innerHTML = '<div class="legend-title ash-legend-toggle">Deposit thickness</div>' +
       values.map(v => `
         <div class="legend-item">
           <span class="ash-legend-swatch" style="background:${colorFor(v)}"></span>
           <span>${v} mm</span>
         </div>`).join('') +
       '<div class="legend-item" style="margin-top:0.4rem"><span class="ash-legend-dot"></span><span>📚 School</span></div>';
+    div.querySelector('.ash-legend-toggle').addEventListener('click', () => div.classList.toggle('collapsed'));
     return div;
   };
   return legend;
