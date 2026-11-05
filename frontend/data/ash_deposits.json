@@ -2,137 +2,270 @@
   "models": {
     "Kanlaon": [
       {
-        "id": "kanlaon_20261104T1200Z_run20261104T0630Z",
-        "title": "Kanlaon 4 November 2026 Eruption",
+        "id": "kanlaon_20261104_8pm_6km",
+        "title": "Kanlaon 4 November 2026 · 8PM · 6 km plume",
         "eruptionStart": "2026-11-04T12:00:00Z",
         "runDate": "2026-11-04T06:30:00Z",
-        "url": "./data/ash/kanlaon_20261104T1200Z_run20261104T0630Z.geojson"
+        "scenario": {
+          "set": "kanlaon_20261104",
+          "setTitle": "Kanlaon 4 November 2026 Simulations",
+          "date": "2026-11-04",
+          "time": "8PM",
+          "plumeKm": 6
+        },
+        "url": "./data/ash/kanlaon_20261104_8pm_6km.geojson"
       },
       {
-        "id": "kanlaon_20261104T1200Z_run20261104T0614Z",
-        "title": "Kanlaon 4 November 2026 Eruption",
+        "id": "kanlaon_20261104_8pm_5km",
+        "title": "Kanlaon 4 November 2026 · 8PM · 5 km plume",
         "eruptionStart": "2026-11-04T12:00:00Z",
         "runDate": "2026-11-04T06:14:00Z",
-        "url": "./data/ash/kanlaon_20261104T1200Z_run20261104T0614Z.geojson"
+        "scenario": {
+          "set": "kanlaon_20261104",
+          "setTitle": "Kanlaon 4 November 2026 Simulations",
+          "date": "2026-11-04",
+          "time": "8PM",
+          "plumeKm": 5
+        },
+        "url": "./data/ash/kanlaon_20261104_8pm_5km.geojson"
       },
       {
-        "id": "kanlaon_20261104T1200Z_run20261104T0604Z",
-        "title": "Kanlaon 4 November 2026 Eruption",
+        "id": "kanlaon_20261104_8pm_4km",
+        "title": "Kanlaon 4 November 2026 · 8PM · 4 km plume",
         "eruptionStart": "2026-11-04T12:00:00Z",
         "runDate": "2026-11-04T06:04:00Z",
-        "url": "./data/ash/kanlaon_20261104T1200Z_run20261104T0604Z.geojson"
+        "scenario": {
+          "set": "kanlaon_20261104",
+          "setTitle": "Kanlaon 4 November 2026 Simulations",
+          "date": "2026-11-04",
+          "time": "8PM",
+          "plumeKm": 4
+        },
+        "url": "./data/ash/kanlaon_20261104_8pm_4km.geojson"
       },
       {
-        "id": "kanlaon_20261104T1200Z_run20261104T0554Z",
-        "title": "Kanlaon 4 November 2026 Eruption",
+        "id": "kanlaon_20261104_8pm_3km",
+        "title": "Kanlaon 4 November 2026 · 8PM · 3 km plume",
         "eruptionStart": "2026-11-04T12:00:00Z",
         "runDate": "2026-11-04T05:54:00Z",
-        "url": "./data/ash/kanlaon_20261104T1200Z_run20261104T0554Z.geojson"
+        "scenario": {
+          "set": "kanlaon_20261104",
+          "setTitle": "Kanlaon 4 November 2026 Simulations",
+          "date": "2026-11-04",
+          "time": "8PM",
+          "plumeKm": 3
+        },
+        "url": "./data/ash/kanlaon_20261104_8pm_3km.geojson"
       },
       {
-        "id": "kanlaon_20261104T1200Z_run20261104T0551Z",
-        "title": "Kanlaon 4 November 2026 Eruption",
+        "id": "kanlaon_20261104_8pm_2km",
+        "title": "Kanlaon 4 November 2026 · 8PM · 2 km plume",
         "eruptionStart": "2026-11-04T12:00:00Z",
         "runDate": "2026-11-04T05:51:00Z",
-        "url": "./data/ash/kanlaon_20261104T1200Z_run20261104T0551Z.geojson"
+        "scenario": {
+          "set": "kanlaon_20261104",
+          "setTitle": "Kanlaon 4 November 2026 Simulations",
+          "date": "2026-11-04",
+          "time": "8PM",
+          "plumeKm": 2
+        },
+        "url": "./data/ash/kanlaon_20261104_8pm_2km.geojson"
       },
       {
-        "id": "kanlaon_20261104T0000Z_run20261104T0539Z",
-        "title": "Kanlaon 4 November 2026 Eruption",
+        "id": "kanlaon_20261104_8am_6km",
+        "title": "Kanlaon 4 November 2026 · 8AM · 6 km plume",
         "eruptionStart": "2026-11-04T00:00:00Z",
         "runDate": "2026-11-04T05:39:00Z",
-        "url": "./data/ash/kanlaon_20261104T0000Z_run20261104T0539Z.geojson"
+        "scenario": {
+          "set": "kanlaon_20261104",
+          "setTitle": "Kanlaon 4 November 2026 Simulations",
+          "date": "2026-11-04",
+          "time": "8AM",
+          "plumeKm": 6
+        },
+        "url": "./data/ash/kanlaon_20261104_8am_6km.geojson"
       },
       {
-        "id": "kanlaon_20261104T0000Z_run20261104T0536Z",
-        "title": "Kanlaon 4 November 2026 Eruption",
+        "id": "kanlaon_20261104_8am_5km",
+        "title": "Kanlaon 4 November 2026 · 8AM · 5 km plume",
         "eruptionStart": "2026-11-04T00:00:00Z",
         "runDate": "2026-11-04T05:36:00Z",
-        "url": "./data/ash/kanlaon_20261104T0000Z_run20261104T0536Z.geojson"
+        "scenario": {
+          "set": "kanlaon_20261104",
+          "setTitle": "Kanlaon 4 November 2026 Simulations",
+          "date": "2026-11-04",
+          "time": "8AM",
+          "plumeKm": 5
+        },
+        "url": "./data/ash/kanlaon_20261104_8am_5km.geojson"
       },
       {
-        "id": "kanlaon_20261104T0000Z_run20261104T0359Z",
-        "title": "Kanlaon 4 November 2026 Eruption",
+        "id": "kanlaon_20261104_8am_3km",
+        "title": "Kanlaon 4 November 2026 · 8AM · 3 km plume",
         "eruptionStart": "2026-11-04T00:00:00Z",
         "runDate": "2026-11-04T03:59:00Z",
-        "url": "./data/ash/kanlaon_20261104T0000Z_run20261104T0359Z.geojson"
+        "scenario": {
+          "set": "kanlaon_20261104",
+          "setTitle": "Kanlaon 4 November 2026 Simulations",
+          "date": "2026-11-04",
+          "time": "8AM",
+          "plumeKm": 3
+        },
+        "url": "./data/ash/kanlaon_20261104_8am_3km.geojson"
       },
       {
-        "id": "kanlaon_20261104T0000Z_run20261103T0639Z",
-        "title": "Kanlaon 4 November 2026 Eruption",
+        "id": "kanlaon_20261104_8am_2km",
+        "title": "Kanlaon 4 November 2026 · 8AM · 2 km plume",
         "eruptionStart": "2026-11-04T00:00:00Z",
         "runDate": "2026-11-03T06:39:00Z",
-        "url": "./data/ash/kanlaon_20261104T0000Z_run20261103T0639Z.geojson"
+        "scenario": {
+          "set": "kanlaon_20261104",
+          "setTitle": "Kanlaon 4 November 2026 Simulations",
+          "date": "2026-11-04",
+          "time": "8AM",
+          "plumeKm": 2
+        },
+        "url": "./data/ash/kanlaon_20261104_8am_2km.geojson"
       },
       {
-        "id": "kanlaon_20261103T1200Z_run20261104T0322Z",
-        "title": "Kanlaon 3 November 2026 Eruption",
+        "id": "kanlaon_20261103_8pm_6km",
+        "title": "Kanlaon 3 November 2026 · 8PM · 6 km plume",
         "eruptionStart": "2026-11-03T12:00:00Z",
         "runDate": "2026-11-04T03:22:00Z",
-        "url": "./data/ash/kanlaon_20261103T1200Z_run20261104T0322Z.geojson"
+        "scenario": {
+          "set": "kanlaon_20261103",
+          "setTitle": "Kanlaon 3 November 2026 Simulations",
+          "date": "2026-11-03",
+          "time": "8PM",
+          "plumeKm": 6
+        },
+        "url": "./data/ash/kanlaon_20261103_8pm_6km.geojson"
       },
       {
-        "id": "kanlaon_20261103T1200Z_run20261104T0319Z",
-        "title": "Kanlaon 3 November 2026 Eruption",
+        "id": "kanlaon_20261103_8pm_5km",
+        "title": "Kanlaon 3 November 2026 · 8PM · 5 km plume",
         "eruptionStart": "2026-11-03T12:00:00Z",
         "runDate": "2026-11-04T03:19:00Z",
-        "url": "./data/ash/kanlaon_20261103T1200Z_run20261104T0319Z.geojson"
+        "scenario": {
+          "set": "kanlaon_20261103",
+          "setTitle": "Kanlaon 3 November 2026 Simulations",
+          "date": "2026-11-03",
+          "time": "8PM",
+          "plumeKm": 5
+        },
+        "url": "./data/ash/kanlaon_20261103_8pm_5km.geojson"
       },
       {
-        "id": "kanlaon_20261103T1200Z_run20261104T0316Z",
-        "title": "Kanlaon 3 November 2026 Eruption",
+        "id": "kanlaon_20261103_8pm_4km",
+        "title": "Kanlaon 3 November 2026 · 8PM · 4 km plume",
         "eruptionStart": "2026-11-03T12:00:00Z",
         "runDate": "2026-11-04T03:16:00Z",
-        "url": "./data/ash/kanlaon_20261103T1200Z_run20261104T0316Z.geojson"
+        "scenario": {
+          "set": "kanlaon_20261103",
+          "setTitle": "Kanlaon 3 November 2026 Simulations",
+          "date": "2026-11-03",
+          "time": "8PM",
+          "plumeKm": 4
+        },
+        "url": "./data/ash/kanlaon_20261103_8pm_4km.geojson"
       },
       {
-        "id": "kanlaon_20261103T1200Z_run20261104T0305Z",
-        "title": "Kanlaon 3 November 2026 Eruption",
+        "id": "kanlaon_20261103_8pm_3km",
+        "title": "Kanlaon 3 November 2026 · 8PM · 3 km plume",
         "eruptionStart": "2026-11-03T12:00:00Z",
         "runDate": "2026-11-04T03:05:00Z",
-        "url": "./data/ash/kanlaon_20261103T1200Z_run20261104T0305Z.geojson"
+        "scenario": {
+          "set": "kanlaon_20261103",
+          "setTitle": "Kanlaon 3 November 2026 Simulations",
+          "date": "2026-11-03",
+          "time": "8PM",
+          "plumeKm": 3
+        },
+        "url": "./data/ash/kanlaon_20261103_8pm_3km.geojson"
       },
       {
-        "id": "kanlaon_20261103T1200Z_run20261104T0221Z",
-        "title": "Kanlaon 3 November 2026 Eruption",
+        "id": "kanlaon_20261103_8pm_2km",
+        "title": "Kanlaon 3 November 2026 · 8PM · 2 km plume",
         "eruptionStart": "2026-11-03T12:00:00Z",
         "runDate": "2026-11-04T02:21:00Z",
-        "url": "./data/ash/kanlaon_20261103T1200Z_run20261104T0221Z.geojson"
+        "scenario": {
+          "set": "kanlaon_20261103",
+          "setTitle": "Kanlaon 3 November 2026 Simulations",
+          "date": "2026-11-03",
+          "time": "8PM",
+          "plumeKm": 2
+        },
+        "url": "./data/ash/kanlaon_20261103_8pm_2km.geojson"
       },
       {
-        "id": "kanlaon_20261103T0000Z_run20261104T0211Z",
-        "title": "Kanlaon 3 November 2026 Eruption",
+        "id": "kanlaon_20261103_8am_6km",
+        "title": "Kanlaon 3 November 2026 · 8AM · 6 km plume",
         "eruptionStart": "2026-11-03T00:00:00Z",
         "runDate": "2026-11-04T02:11:00Z",
-        "url": "./data/ash/kanlaon_20261103T0000Z_run20261104T0211Z.geojson"
+        "scenario": {
+          "set": "kanlaon_20261103",
+          "setTitle": "Kanlaon 3 November 2026 Simulations",
+          "date": "2026-11-03",
+          "time": "8AM",
+          "plumeKm": 6
+        },
+        "url": "./data/ash/kanlaon_20261103_8am_6km.geojson"
       },
       {
-        "id": "kanlaon_20261103T0000Z_run20261104T0206Z",
-        "title": "Kanlaon 3 November 2026 Eruption",
+        "id": "kanlaon_20261103_8am_5km",
+        "title": "Kanlaon 3 November 2026 · 8AM · 5 km plume",
         "eruptionStart": "2026-11-03T00:00:00Z",
         "runDate": "2026-11-04T02:06:00Z",
-        "url": "./data/ash/kanlaon_20261103T0000Z_run20261104T0206Z.geojson"
+        "scenario": {
+          "set": "kanlaon_20261103",
+          "setTitle": "Kanlaon 3 November 2026 Simulations",
+          "date": "2026-11-03",
+          "time": "8AM",
+          "plumeKm": 5
+        },
+        "url": "./data/ash/kanlaon_20261103_8am_5km.geojson"
       },
       {
-        "id": "kanlaon_20261103T0000Z_run20261104T0200Z",
-        "title": "Kanlaon 3 November 2026 Eruption",
+        "id": "kanlaon_20261103_8am_4km",
+        "title": "Kanlaon 3 November 2026 · 8AM · 4 km plume",
         "eruptionStart": "2026-11-03T00:00:00Z",
         "runDate": "2026-11-04T02:00:00Z",
-        "url": "./data/ash/kanlaon_20261103T0000Z_run20261104T0200Z.geojson"
+        "scenario": {
+          "set": "kanlaon_20261103",
+          "setTitle": "Kanlaon 3 November 2026 Simulations",
+          "date": "2026-11-03",
+          "time": "8AM",
+          "plumeKm": 4
+        },
+        "url": "./data/ash/kanlaon_20261103_8am_4km.geojson"
       },
       {
-        "id": "kanlaon_20261103T0000Z_run20261103T0814Z",
-        "title": "Kanlaon 3 November 2026 Eruption",
+        "id": "kanlaon_20261103_8am_3km",
+        "title": "Kanlaon 3 November 2026 · 8AM · 3 km plume",
         "eruptionStart": "2026-11-03T00:00:00Z",
         "runDate": "2026-11-03T08:14:00Z",
-        "url": "./data/ash/kanlaon_20261103T0000Z_run20261103T0814Z.geojson"
+        "scenario": {
+          "set": "kanlaon_20261103",
+          "setTitle": "Kanlaon 3 November 2026 Simulations",
+          "date": "2026-11-03",
+          "time": "8AM",
+          "plumeKm": 3
+        },
+        "url": "./data/ash/kanlaon_20261103_8am_3km.geojson"
       },
       {
-        "id": "kanlaon_20261103T0000Z_run20261103T0804Z",
-        "title": "Kanlaon 3 November 2026 Eruption",
+        "id": "kanlaon_20261103_8am_2km",
+        "title": "Kanlaon 3 November 2026 · 8AM · 2 km plume",
         "eruptionStart": "2026-11-03T00:00:00Z",
         "runDate": "2026-11-03T08:04:00Z",
-        "url": "./data/ash/kanlaon_20261103T0000Z_run20261103T0804Z.geojson"
+        "scenario": {
+          "set": "kanlaon_20261103",
+          "setTitle": "Kanlaon 3 November 2026 Simulations",
+          "date": "2026-11-03",
+          "time": "8AM",
+          "plumeKm": 2
+        },
+        "url": "./data/ash/kanlaon_20261103_8am_2km.geojson"
       },
       {
         "id": "kanlaon_20240603T1051Z_run20260511T0256Z",
@@ -151,18 +284,18 @@
         "url": "./data/ash/mayon_20261103T0022Z_run20261103T0156Z.geojson"
       },
       {
-        "id": "mayon_20261030T0352Z_run20261031T0259Z",
-        "title": "Mayon 30 October 2026 Eruption",
-        "eruptionStart": "2026-10-30T03:52:00Z",
-        "runDate": "2026-10-31T02:59:00Z",
-        "url": "./data/ash/mayon_20261030T0352Z_run20261031T0259Z.geojson"
-      },
-      {
         "id": "mayon_20261030T0352Z_run20261030T0510Z",
         "title": "Mayon 30 October 2026 Eruption",
         "eruptionStart": "2026-10-30T03:52:00Z",
         "runDate": "2026-10-30T05:10:00Z",
         "url": "./data/ash/mayon_20261030T0352Z_run20261030T0510Z.geojson"
+      },
+      {
+        "id": "mayon_20261030T0352Z_run20261031T0259Z",
+        "title": "Mayon 30 October 2026 Eruption",
+        "eruptionStart": "2026-10-30T03:52:00Z",
+        "runDate": "2026-10-31T02:59:00Z",
+        "url": "./data/ash/mayon_20261030T0352Z_run20261031T0259Z.geojson"
       },
       {
         "id": "mayon_20261026T0259Z_run20261026T0259Z",
@@ -172,14 +305,6 @@
         "url": "./data/ash/mayon_20261026T0259Z_run20261026T0259Z.geojson"
       }
     ],
-    "Taal": [
-      {
-        "id": "taal_run20210525T064854Z",
-        "title": "Taal Ash3d Model · 25 May 2021",
-        "eruptionStart": null,
-        "runDate": "2021-05-25T06:48:54.000Z",
-        "url": "./data/ash/taal_run20210525T064854Z.geojson"
-      }
-    ]
+    "Taal": []
   }
 }
