@@ -23,7 +23,21 @@ function setStatus(text) {
   if (el) el.textContent = text;
 }
 
+// Minimize / expand buttons in the Risk Zones and Ashfall Simulation headers.
+function initPanelToggles() {
+  document.querySelectorAll('[data-panel-toggle]').forEach(btn => {
+    const label = btn.getAttribute('aria-label').replace(/^Minimize /, '');
+    btn.addEventListener('click', () => {
+      const collapsed = btn.closest('.panel').classList.toggle('collapsed');
+      btn.textContent = collapsed ? '+' : '−';
+      btn.setAttribute('aria-expanded', String(!collapsed));
+      btn.setAttribute('aria-label', `${collapsed ? 'Expand' : 'Minimize'} ${label}`);
+    });
+  });
+}
+
 async function main() {
+  initPanelToggles();
   initMap();
   initAshDepositMap();
 

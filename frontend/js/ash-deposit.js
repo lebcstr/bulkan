@@ -9,7 +9,10 @@ const THICKNESS_RAMP = ['#67e8f9', '#a3e635', '#facc15', '#f59e0b', '#ea580c', '
 const SCHOOLS_PER_BAND = 100;
 
 const geojsonCache = {};
+// Volcano → picked run, or scenario set for scheduled runs.
 const selectedRun = {};
+// Kept across volcanoes and dates so the same scenario stays up while browsing.
+const selectedScenario = { time: null, plumeKm: null };
 let manifestPromise = null;
 let renderToken = 0;
 let ashMap = null;
@@ -161,36 +164,49 @@ function renderSchoolBox(schools, values, markers) {
   if (!el) return;
 
   const bands = values.map(v => ({ value: v, schools: schools.filter(s => s.thickness === v) }));
-  const chips = bands.map(b => `
-    <div class="ash-band-chip" style="border-left-color:${colorFor(b.value)}">
+  // Chips filter the list to one band; clicking the active chip shows all again.
+  const chips = bands.map((b, i) => `
+    <button type="button" class="ash-band-chip" data-band="${i}" aria-pressed="false"
+      style="border-left-color:${colorFor(b.value)}" ${b.schools.length ? '' : 'disabled'}>
       <span>${bandLabel(b.value, values)}</span><strong>${b.schools.length}</strong>
-    </div>`).join('');
+    </button>`).join('');
   const items = (list, color) => list.map(s => `
     <div class="ash-school-item" data-id="${s.id}" style="border-left-color:${color}">
-      <div>📚 ${s.name}</div>
+      <div>${s.name}</div>
       <div class="ash-school-meta">${s.type} • ${s.distance.toFixed(1)} km</div>
     </div>`).join('');
   // Render the first SCHOOLS_PER_BAND per band; the rest on request.
-  const list = bands.filter(b => b.schools.length).map((b, i) => `
+  const list = shown => shown.filter(b => b.schools.length).map(b => `
     <div class="ash-band-title" style="color:${colorFor(b.value)}">${bandLabel(b.value, values)} • ${b.schools.length}</div>
     ${items(b.schools.slice(0, SCHOOLS_PER_BAND), colorFor(b.value))}
     ${b.schools.length > SCHOOLS_PER_BAND
-      ? `<button class="ash-show-more" data-band="${i}">Show all ${b.schools.length} schools</button>`
-      : ''}`).join('');
-  const shownBands = bands.filter(b => b.schools.length);
+      ? `<button class="ash-show-more" data-band="${bands.indexOf(b)}">Show all ${b.schools.length} schools</button>`
+      : ''}`).join('') || '<div class="ash-school-meta" style="text-align:center">No schools</div>';
 
   el.innerHTML = `
     <div class="ash-school-head">
-      <div class="ash-school-title">📚 Schools by Ash Deposit</div>
-      <div class="ash-school-sub">${schools.length} schools within ${values.at(-1)} mm isopach</div>
+      <div class="ash-school-title">${schools.length.toLocaleString()} Schools Affected by Ash Deposit within ${values.at(-1)} mm isopach</div>
     </div>
     <div class="ash-band-chips">${chips}</div>
-    <div class="ash-school-list">${list || '<div class="ash-school-meta" style="text-align:center">No schools</div>'}</div>`;
+    <div class="ash-school-list">${list(bands)}</div>`;
 
-  el.querySelector('.ash-school-list').addEventListener('click', e => {
+  const listEl = el.querySelector('.ash-school-list');
+  el.querySelector('.ash-band-chips').addEventListener('click', e => {
+    const chip = e.target.closest('.ash-band-chip');
+    if (!chip || chip.disabled) return;
+    const on = chip.getAttribute('aria-pressed') !== 'true';
+    el.querySelectorAll('.ash-band-chip').forEach(c => {
+      c.classList.toggle('active', on && c === chip);
+      c.setAttribute('aria-pressed', String(on && c === chip));
+    });
+    listEl.innerHTML = list(on ? [bands[chip.dataset.band]] : bands);
+    listEl.scrollTop = 0;
+  });
+
+  listEl.addEventListener('click', e => {
     const more = e.target.closest('.ash-show-more');
     if (more) {
-      const band = shownBands[more.dataset.band];
+      const band = bands[more.dataset.band];
       more.outerHTML = items(band.schools.slice(SCHOOLS_PER_BAND), colorFor(band.value));
       return;
     }
@@ -202,31 +218,6 @@ function renderSchoolBox(schools, values, markers) {
   });
 }
 
-// Older Ash3d exports carry no eruption parameters, so only show what exists.
-function renderInfo(props, model, values) {
-  const el = document.getElementById('ash-deposit-info');
-  if (!el) return;
-  const utc = iso => new Date(iso).toUTCString().replace(':00 GMT', ' UTC');
-  const rows = [
-    ['Eruption start', props.E_STIME && utc(props.E_STIME)],
-    ['Plume height', props.E_PLMH && `${parseFloat(props.E_PLMH)} km`],
-    ['Duration', props.E_DUR && `${parseFloat(props.E_DUR)} h`],
-    ['Erupted volume', props.E_VOL && `${parseFloat(props.E_VOL)} km³`],
-    ['Deposit time', props.TIME && utc(props.TIME)],
-    ['Isopachs', `${values.length} (${values.at(-1)}–${values[0]} mm)`],
-    ['Model run', props.ORG
-      ? `${props.ORG} Ash3d · ${props['RUN CLASS']}`
-      : `Ash3d · ${new Date(model.runDate).toISOString().slice(0, 10)}`],
-  ].filter(([, v]) => v);
-  el.innerHTML = rows.map(([k, v]) => `
-    <div class="ash-info-row">
-      <div class="ash-info-label">${k}</div>
-      <div class="ash-info-value">${v}</div>
-    </div>`).join('') +
-    (props.E_STIME ? '' : '<div class="ash-info-note">Eruption parameters are not included in this shapefile (older Ash3d export).</div>') +
-    `<a class="ash-info-link" href="${props.URL || 'https://vsc-ash.wr.usgs.gov/ash3d-gui'}" target="_blank" rel="noopener">USGS Ash3d ↗</a>`;
-}
-
 function setHeader(text) {
   const el = document.getElementById('ash-deposit-title');
   if (el) el.textContent = `Ashfall Dispersal Simulation · ${text.toUpperCase()}`;
@@ -234,7 +225,8 @@ function setHeader(text) {
 
 function showEmpty(vol, message) {
   document.getElementById('ash-deposit-body')?.classList.add('hidden');
-  document.getElementById('ash-deposit-run')?.classList.add('hidden');
+  document.getElementById('ash-deposit-calendar')?.classList.add('hidden');
+  closeCalendar();
   const empty = document.getElementById('ash-deposit-empty');
   if (empty) {
     empty.classList.remove('hidden');
@@ -256,19 +248,195 @@ function loadManifest() {
   return manifestPromise;
 }
 
-// Run picker in the panel header; only shown when a volcano has several runs.
-function renderRunPicker(vol, models, model) {
-  const select = document.getElementById('ash-deposit-run');
-  if (!select) return;
-  select.classList.toggle('hidden', models.length < 2);
-  select.innerHTML = models.map(m => `
-    <option value="${m.id}" ${m.id === model.id ? 'selected' : ''}>
-      ${m.title} · run ${m.runDate.slice(0, 10)}
-    </option>`).join('');
-  select.onchange = () => {
-    selectedRun[vol] = select.value;
+// YYYY-MM-DD in Philippine time.
+const phDate = iso => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Manila' }).format(new Date(iso));
+
+// Scheduled runs share a scenario set (one date, time × plume height); each
+// older run that doesn't follow the naming convention is a group of its own.
+function groupRuns(models) {
+  const groups = [];
+  for (const m of models) {
+    const id = m.scenario?.set || m.id;
+    let group = groups.find(g => g.id === id);
+    if (!group) {
+      group = {
+        id,
+        date: m.scenario?.date || phDate(m.eruptionStart || m.runDate),
+        title: m.scenario ? m.scenario.setTitle : `${m.title} · run ${m.runDate.slice(0, 10)}`,
+        models: [],
+      };
+      groups.push(group);
+    }
+    group.models.push(m);
+  }
+  return groups;
+}
+
+const hour24 = time => (parseInt(time, 10) % 12) + (/PM/i.test(time) ? 12 : 0);
+const uniqueSorted = (values, key) => [...new Set(values)].sort((a, b) => key(a) - key(b));
+
+function scenarioOptions(group) {
+  const scenarios = group.models.map(m => m.scenario);
+  return {
+    times: uniqueSorted(scenarios.map(s => s.time), hour24),
+    plumes: uniqueSorted(scenarios.map(s => s.plumeKm), Number),
+  };
+}
+
+// The selected time and plume height, or the closest this set has: older sets
+// may be missing some of the 10 scenarios.
+function pickModel(group) {
+  if (!group.models[0].scenario) return group.models[0];
+  const { times } = scenarioOptions(group);
+  const time = times.includes(selectedScenario.time) ? selectedScenario.time : times[0];
+  const atTime = group.models
+    .filter(m => m.scenario.time === time)
+    .sort((a, b) => a.scenario.plumeKm - b.scenario.plumeKm);
+  const want = selectedScenario.plumeKm ?? atTime[Math.floor(atTime.length / 2)].scenario.plumeKm;
+  const gap = m => Math.abs(m.scenario.plumeKm - want);
+  return atTime.reduce((best, m) => (gap(m) < gap(best) ? m : best));
+}
+
+// ── Date picker: a month calendar; days without a simulation are struck through.
+
+const formatDay = date => new Date(`${date}T00:00:00Z`).toLocaleDateString('en-GB', {
+  day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC',
+});
+const shiftMonth = (month, step) => {
+  const [y, m] = month.split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1 + step, 1)).toISOString().slice(0, 7);
+};
+
+let calendar = null; // { vol, groups, group, month } for the panel on screen
+
+function closeCalendar() {
+  document.getElementById('ash-calendar-pop')?.classList.add('hidden');
+  document.getElementById('ash-calendar-trigger')?.setAttribute('aria-expanded', 'false');
+}
+
+function drawCalendar() {
+  const pop = document.getElementById('ash-calendar-pop');
+  const { groups, group, month } = calendar;
+  const available = new Set(groups.map(g => g.date));
+  const months = groups.map(g => g.date.slice(0, 7)).sort();
+  const [y, m] = month.split('-').map(Number);
+  const lead = new Date(Date.UTC(y, m - 1, 1)).getUTCDay();
+  const days = new Date(Date.UTC(y, m, 0)).getUTCDate();
+
+  const cells = Array.from({ length: days }, (_, i) => {
+    const date = `${month}-${String(i + 1).padStart(2, '0')}`;
+    return available.has(date)
+      ? `<button type="button" class="ash-cal-day available ${date === group.date ? 'selected' : ''}" data-date="${date}"
+          aria-pressed="${date === group.date}" aria-label="${formatDay(date)}">${i + 1}</button>`
+      : `<span class="ash-cal-day unavailable" title="No simulation">${i + 1}</span>`;
+  });
+  pop.innerHTML = `
+    <div class="ash-cal-head">
+      <button type="button" class="ash-cal-nav" data-step="-1" aria-label="Previous month" ${month <= months[0] ? 'disabled' : ''}>‹</button>
+      <span>${new Date(Date.UTC(y, m - 1, 1)).toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' })}</span>
+      <button type="button" class="ash-cal-nav" data-step="1" aria-label="Next month" ${month >= months.at(-1) ? 'disabled' : ''}>›</button>
+    </div>
+    <div class="ash-cal-grid">
+      ${['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => `<span class="ash-cal-weekday">${d}</span>`).join('')}
+      ${'<span></span>'.repeat(lead)}${cells.join('')}
+    </div>`;
+}
+
+function renderCalendar(vol, groups, group) {
+  const wrap = document.getElementById('ash-deposit-calendar');
+  if (!wrap) return;
+  const pop = document.getElementById('ash-calendar-pop');
+  const trigger = document.getElementById('ash-calendar-trigger');
+  wrap.classList.remove('hidden');
+  calendar = { vol, groups, group, month: group.date.slice(0, 7) };
+  trigger.textContent = `📅 ${formatDay(group.date)} ▾`;
+  trigger.title = 'Pick a simulation date';
+  closeCalendar();
+
+  trigger.onclick = () => {
+    const open = pop.classList.toggle('hidden') === false;
+    trigger.setAttribute('aria-expanded', String(open));
+    if (open) {
+      calendar.month = calendar.group.date.slice(0, 7);
+      drawCalendar();
+    }
+  };
+  pop.onclick = e => {
+    const nav = e.target.closest('.ash-cal-nav');
+    if (nav && !nav.disabled) {
+      calendar.month = shiftMonth(calendar.month, Number(nav.dataset.step));
+      drawCalendar();
+      return;
+    }
+    const day = e.target.closest('.ash-cal-day.available');
+    if (!day) return;
+    closeCalendar();
+    // A day with several runs opens on the first; the Run toggle switches.
+    selectedRun[calendar.vol] = calendar.groups.find(g => g.date === day.dataset.date).id;
     updateAshDeposit();
   };
+}
+
+// The path is captured at dispatch, so clicks that redraw the calendar still count as inside.
+document.addEventListener('click', e => {
+  const wrap = document.getElementById('ash-deposit-calendar');
+  if (wrap && !e.composedPath().includes(wrap)) closeCalendar();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeCalendar();
+});
+
+const toggleButtons = (values, current, label, available = () => true, unavailableTitle = '', title = () => '') =>
+  values.map(v => `
+    <button type="button" data-value="${v}" class="${v === current ? 'active' : ''}" aria-pressed="${v === current}"
+      ${title(v) ? `title="${title(v)}"` : ''} ${available(v) ? '' : `disabled title="${unavailableTitle}"`}>${label(v)}</button>`).join('');
+
+// Run toggle for days with several runs, and time / plume height toggles for
+// scenario sets. The bar is hidden when there's nothing to switch.
+function renderScenarioToggles(vol, groups, group, model) {
+  const bar = document.getElementById('ash-deposit-scenario');
+  if (!bar) return;
+  const timeEl = document.getElementById('ash-scenario-time');
+  const plumeEl = document.getElementById('ash-scenario-plume');
+  const runEl = document.getElementById('ash-scenario-run');
+  const sameDay = groups.filter(g => g.date === group.date);
+  bar.classList.toggle('hidden', !model.scenario && sameDay.length < 2);
+  runEl.parentElement.classList.toggle('hidden', sameDay.length < 2);
+  timeEl.parentElement.classList.toggle('hidden', !model.scenario);
+  plumeEl.parentElement.classList.toggle('hidden', !model.scenario);
+
+  const runIds = sameDay.map(g => g.id);
+  runEl.innerHTML = toggleButtons(runIds, group.id, id => `Run ${runIds.indexOf(id) + 1}`,
+    undefined, '', id => sameDay.find(g => g.id === id).title);
+  runEl.onclick = e => {
+    const button = e.target.closest('button');
+    if (!button) return;
+    selectedRun[vol] = button.dataset.value;
+    updateAshDeposit();
+  };
+  if (!model.scenario) return;
+
+  const { times, plumes } = scenarioOptions(group);
+  const simulated = new Set(group.models
+    .filter(m => m.scenario.time === model.scenario.time)
+    .map(m => m.scenario.plumeKm));
+  const bind = (el, apply) => {
+    el.onclick = e => {
+      const button = e.target.closest('button');
+      if (!button || button.disabled) return;
+      // Pin what's on screen first, so changing one toggle keeps the other.
+      selectedScenario.time = model.scenario.time;
+      selectedScenario.plumeKm = model.scenario.plumeKm;
+      apply(button.dataset.value);
+      updateAshDeposit();
+    };
+  };
+
+  timeEl.innerHTML = toggleButtons(times, model.scenario.time, t => t);
+  plumeEl.innerHTML = toggleButtons(plumes, model.scenario.plumeKm, km => `${km} KM`, km => simulated.has(km),
+    `Not simulated for ${model.scenario.time}`);
+  bind(timeEl, v => { selectedScenario.time = v; });
+  bind(plumeEl, v => { selectedScenario.plumeKm = Number(v); });
 }
 
 async function loadGeojson(url) {
@@ -311,8 +479,11 @@ export async function updateAshDeposit() {
       showEmpty(vol, `No ash deposit model available for ${vol} Volcano.`);
       return;
     }
-    model = models.find(m => m.id === selectedRun[vol]) || models[0];
-    renderRunPicker(vol, models, model);
+    const groups = groupRuns(models);
+    const group = groups.find(g => g.id === selectedRun[vol]) || groups[0];
+    model = pickModel(group);
+    renderCalendar(vol, groups, group);
+    renderScenarioToggles(vol, groups, group, model);
     geojson = await loadGeojson(model.url);
   } catch (e) {
     console.error(`[ash-deposit] failed to load ${vol} ash deposit model:`, e);
@@ -357,5 +528,4 @@ export async function updateAshDeposit() {
 
   ashLegend = makeLegend(values).addTo(ashMap);
   renderSchoolBox(schools, values, markers);
-  //renderInfo(geojson.features[0].properties, model, values);
 }

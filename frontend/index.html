@@ -46,7 +46,7 @@
 <div class="monitoring-container">
   <!-- MONITORING PARAMETERS -->
   <div class="panel">
-    <div class="panel-header">📊 MONITORING PARAMETERS</div>
+    <div class="panel-header">MONITORING PARAMETERS</div>
     <div style="padding:0.5rem 1.25rem;border-bottom:1px solid var(--border);font-size:10px;color:var(--text2)">
       <span id="param-latest-update">--</span>
     </div>
@@ -55,7 +55,7 @@
 
   <!-- PARAMETER THRESHOLD ANALYSIS -->
   <div class="panel">
-    <div class="panel-header">🎯 PARAMETER THRESHOLD ANALYSIS</div>
+    <div class="panel-header">PARAMETER THRESHOLD ANALYSIS</div>
     <div class="panel-body">
       <div class="radar-chart-container" style="height:250px">
         <canvas id="radarChart"></canvas>
@@ -86,7 +86,7 @@
 <div class="trends-container">
   <div class="panel" style="margin-bottom:0">
     <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center;padding:0.85rem 1.25rem">
-      <h2 style="margin:0;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px">📈 PARAMETER TRENDS</h2>
+      <h2 style="margin:0;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px">PARAMETER TRENDS</h2>
       <div style="display:flex;gap:0.5rem;align-items:center">
         <div style="display:flex;gap:0.5rem">
           <button class="time-tab active" onclick="selectTimeRange(event, 'daily')" style="padding:0.4rem 0.75rem;font-size:9px">Daily</button>
@@ -145,7 +145,10 @@
 <!-- RISK ZONES MAP - FULL WIDTH BELOW -->
 <div style="padding:0 2rem 2rem;max-width:1600px;margin:0 auto">
   <div class="panel">
-    <div class="panel-header">🗺️ RISK ZONES MAP</div>
+    <div class="panel-header panel-header-row">
+      <span>RISK ZONES</span>
+      <button type="button" class="panel-toggle" data-panel-toggle aria-expanded="true" aria-label="Minimize Risk Zones">−</button>
+    </div>
     <div class="panel-body" style="display: grid; grid-template-columns: 1fr 280px; gap: 1.5rem; align-items: start;">
       <!-- LEFT: MAP SECTION -->
       <div>
@@ -201,14 +204,33 @@
   <div class="panel">
     <div class="panel-header ash-deposit-header">
       <span id="ash-deposit-title">🌋 ASH DEPOSIT MODEL</span>
-      <select class="ash-run-select hidden" id="ash-deposit-run" aria-label="Ash deposit model run"></select>
+      <div class="panel-actions">
+        <div class="ash-calendar hidden" id="ash-deposit-calendar">
+          <button type="button" class="ash-calendar-trigger" id="ash-calendar-trigger" aria-haspopup="dialog" aria-expanded="false"></button>
+          <div class="ash-calendar-pop hidden" id="ash-calendar-pop" role="dialog" aria-label="Simulation date"></div>
+        </div>
+        <button type="button" class="panel-toggle" data-panel-toggle aria-expanded="true" aria-label="Minimize Ashfall Simulation">−</button>
+      </div>
     </div>
     <div id="ash-deposit-body">
+      <div class="ash-scenario-bar hidden" id="ash-deposit-scenario">
+        <div class="ash-toggle-group">
+          <span class="ash-toggle-label">Run</span>
+          <div class="ash-toggle" id="ash-scenario-run" role="group" aria-label="Model run on this date"></div>
+        </div>
+        <div class="ash-toggle-group">
+          <span class="ash-toggle-label">Time</span>
+          <div class="ash-toggle" id="ash-scenario-time" role="group" aria-label="Simulation time"></div>
+        </div>
+        <div class="ash-toggle-group">
+          <span class="ash-toggle-label">Plume height</span>
+          <div class="ash-toggle" id="ash-scenario-plume" role="group" aria-label="Plume height"></div>
+        </div>
+      </div>
       <div class="panel-body ash-deposit-body">
         <div id="ash-deposit-map"></div>
         <div class="ash-school-box" id="ash-deposit-schools">Loading…</div>
       </div>
-      <div class="ash-deposit-info" id="ash-deposit-info"></div>
     </div>
     <div class="panel-body ash-deposit-empty hidden" id="ash-deposit-empty"></div>
   </div>
