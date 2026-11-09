@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "sync": "node sync-sheets.mjs",
-    "ash": "node build-ash-deposits.mjs"
+    "ash": "node build-ash-deposits.mjs",
+    "validate": "node validate-data.mjs"
   },
   "engines": {
     "node": ">=20"
