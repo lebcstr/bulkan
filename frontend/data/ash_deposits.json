@@ -2,6 +2,34 @@
   "models": {
     "Kanlaon": [
       {
+        "id": "kanlaon_20261109_8pm_6km",
+        "title": "Kanlaon 9 November 2026 · 8PM · 6 km plume",
+        "eruptionStart": "2026-11-09T12:00:00Z",
+        "runDate": "2026-11-09T07:27:00Z",
+        "scenario": {
+          "set": "kanlaon_20261109",
+          "setTitle": "Kanlaon 9 November 2026 Simulations",
+          "date": "2026-11-09",
+          "time": "8PM",
+          "plumeKm": 6
+        },
+        "url": "./data/ash/kanlaon_20261109_8pm_6km.geojson"
+      },
+      {
+        "id": "kanlaon_20261109_8pm_5km",
+        "title": "Kanlaon 9 November 2026 · 8PM · 5 km plume",
+        "eruptionStart": "2026-11-09T12:00:00Z",
+        "runDate": "2026-11-09T07:15:00Z",
+        "scenario": {
+          "set": "kanlaon_20261109",
+          "setTitle": "Kanlaon 9 November 2026 Simulations",
+          "date": "2026-11-09",
+          "time": "8PM",
+          "plumeKm": 5
+        },
+        "url": "./data/ash/kanlaon_20261109_8pm_5km.geojson"
+      },
+      {
         "id": "kanlaon_20261109_8pm_4km",
         "title": "Kanlaon 9 November 2026 · 8PM · 4 km plume",
         "eruptionStart": "2026-11-09T12:00:00Z",
