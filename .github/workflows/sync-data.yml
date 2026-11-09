@@ -33,6 +33,11 @@ jobs:
           GDRIVE_SA_KEY: ${{ secrets.GDRIVE_SA_KEY }}
         run: npm run ash
 
+      # A failure here ends the job before the commit, so the last good snapshots stay live.
+      - name: Validate snapshots
+        working-directory: scripts
+        run: npm run validate
+
       - name: Commit snapshots
         run: |
           git config user.name  'github-actions[bot]'

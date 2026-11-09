@@ -9,7 +9,7 @@ const OUT_DIR = join(__dirname, '..', 'frontend', 'data');
 
 const COLUMN_INDICES_TAAL = {
   DATE: 1, AlertLevel: 0, VEQ: 5, VolcanicTremors: 6,
-  Rockfall: null, PDCEvents: 5, SO2Flux: 2, PlumeHeight: 9, STALTA: null, Eruption: 11
+  Rockfall: null, PDCEvents: null, SO2Flux: 2, PlumeHeight: 9, STALTA: null, Eruption: 11
 };
 
 const COLUMN_INDICES_MAYON = {
@@ -93,8 +93,9 @@ function rowsToObjects(rows, cols) {
 
 async function syncOne(token, name, source) {
   const rows = await fetchSheet(token, source.sheetId, source.tab);
+  // fetchSheet drops row 1 only; Taal's header row sits below it and must not become a record.
   const records = rowsToObjects(rows, source.columns)
-    .filter(r => r.DATE !== '' && r.DATE !== null);
+    .filter(r => r.DATE !== '' && r.DATE !== null && String(r.DATE).trim().toUpperCase() !== 'DATE');
   if (source.columns.Eruption != null) {
     const eruptions = new Set(rows
       .filter(row => isEruption(pick(row, source.columns.Eruption)))

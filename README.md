@@ -32,10 +32,16 @@ Static dashboard that shows PHIVOLCS-style monitoring data (VEQ, Rockfall, PDC, 
 │   ├── sync-sheets.mjs    Node 20 script: Google Sheets API → JSON
 │   ├── build-ash-deposits.mjs  Ash3d shapefiles (Google Drive) → GeoJSON
 │   ├── google-auth.mjs    service-account token for both scripts
+│   ├── validate-data.mjs  sanity checks run before snapshots are committed
+│   └── package.json
+├── tests/
+│   ├── smoke.mjs          headless browser check used by CI
 │   └── package.json
 └── .github/workflows/
-    ├── sync-data.yml      cron: daily sheet pull → commits data/*.json
-    └── deploy-pages.yml   push: deploys frontend/ to GH Pages
+    ├── ci.yml             pull request: syntax check + browser smoke test
+    ├── sync-data.yml      cron: daily sheet pull → validates → commits data/*.json
+    ├── deploy-pages.yml   push: deploys frontend/ to GH Pages
+    └── monitor.yml        cron: fails if the live data is stale
 ```
 
 ## Run locally
@@ -74,6 +80,30 @@ This overwrites the committed snapshots, so check `git diff` before committing. 
 2. **Settings → Pages → Build and deployment → Source: GitHub Actions**.
 3. The `deploy-pages.yml` workflow publishes `frontend/` on every push to `main` and after a successful data sync.
 4. The `sync-data.yml` workflow runs daily at 01:00 UTC (09:00 PH time, ~30 min after the source sheets refresh) and commits refreshed snapshots. You can trigger it manually from the Actions tab. It needs the `GDRIVE_SA_KEY` repository secret.
+
+## Checks and monitoring
+
+| Check | Runs | Fails when | Effect |
+|---|---|---|---|
+| **CI** (`ci.yml`) | Every pull request into `main` | A script has a syntax error, the site throws a JS error on load, or a local file is missing | Red X on the PR; merging is not blocked |
+| **Data validation** (`npm run validate`) | Daily sync, before the commit | A volcano has no records, loses more than 10% of its records, or has a `DATE` that can't be parsed | Nothing is committed, so the last good snapshots stay live |
+| **Freshness monitor** (`monitor.yml`) | Every 6 hours | The site is unreachable, or a volcano's `syncedAt` is more than 30 hours old | The workflow fails and GitHub sends a failure email |
+
+Run the smoke test locally:
+
+```bash
+python3 -m http.server 8082 -d frontend &
+cd tests
+npm ci
+npx playwright install chromium
+node smoke.mjs
+```
+
+Validation covers the three volcano snapshots only. A failed ash build shows as a failed step in the sync log and keeps the last published models.
+
+The monitor checks GitHub Pages by default. If the site moves, set the `SITE_URL` repository variable (**Settings → Secrets and variables → Actions → Variables**) to the new address, without a trailing slash.
+
+GitHub starts scheduled workflows late: from 25 Oct to 8 Nov 2026 the 09:00 PH sync actually started between about 13:50 and 15:50 PH. The 30-hour limit allows for that. On a host whose timers run on schedule, set the `MAX_AGE_HOURS` repository variable to `26` for earlier alerts.
 
 ## Ash deposit models (USGS Ash3d)
 
@@ -144,4 +174,5 @@ Common errors:
 ## Known gaps
 
 - **Kanlaon** has no columns mapped for `VolcanicTremors`, `Rockfall`, or `PDCEvents`, so those stay empty. If the sheet gains them, update `COLUMN_INDICES_KANLAON`.
+- **Taal** has no columns mapped for `Rockfall` or `PDCEvents`, so those stay empty. Its sheet has no PDC data.
 - **Two legacy HTML files** (`Bulkan Latest.html`, `Volcano Embed HTML.html`) still live at the repo root. They are the pre-split monoliths — keep them for reference or move to an `archive/` folder.

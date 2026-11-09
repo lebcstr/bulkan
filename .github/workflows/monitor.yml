@@ -1,0 +1,30 @@
+name: Monitor Data Freshness
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch: {}
+
+permissions: {}
+
+jobs:
+  freshness:
+    runs-on: ubuntu-latest
+    steps:
+      # Set the SITE_URL and MAX_AGE_HOURS repository variables when the site
+      # moves off GitHub Pages. The 30h default allows for late scheduled runs.
+      - name: Check data age
+        env:
+          SITE: ${{ vars.SITE_URL || 'https://lebcstr.github.io/bulkan' }}
+          MAX_AGE_HOURS: ${{ vars.MAX_AGE_HOURS || 30 }}
+        run: |
+          now=$(date +%s)
+          for v in kanlaon mayon taal; do
+            synced=$(curl -fsS --retry 3 "$SITE/data/$v.json" | jq -r .syncedAt)
+            age=$(( (now - $(date -d "$synced" +%s)) / 3600 ))
+            echo "$v: ${age}h old"
+            if [ "$age" -gt "$MAX_AGE_HOURS" ]; then
+              echo "::error::$v data is ${age}h old (limit ${MAX_AGE_HOURS}h)"
+              exit 1
+            fi
+          done
